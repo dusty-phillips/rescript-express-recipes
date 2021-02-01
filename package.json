@@ -15,5 +15,7 @@
   "devDependencies": {
     "bs-platform": "^8.4.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bs-express": "github:reasonml-community/bs-express"
+  }
 }
