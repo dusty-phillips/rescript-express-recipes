@@ -2,6 +2,10 @@
 'use strict';
 
 var Express = require("bs-express/src/Express.bs.js");
+var Js_dict = require("bs-platform/lib/js/js_dict.js");
+var Js_json = require("bs-platform/lib/js/js_json.js");
+var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
 var app = Express.express(undefined);
 
@@ -15,11 +19,46 @@ Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res)
 
 Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req, res) {
           var jsonResponse = {};
-          var _json = req.body;
-          if (_json == null) {
+          var json = req.body;
+          if (json == null) {
             jsonResponse["error"] = "not a json request";
           } else {
-            jsonResponse["good"] = "response";
+            var jsonBody = Js_json.decodeObject(json);
+            if (jsonBody !== undefined) {
+              var jsonBody$1 = Caml_option.valFromOption(jsonBody);
+              var match = Belt_Option.map(Js_dict.get(jsonBody$1, "title"), Js_json.decodeString);
+              var match$1 = Belt_Option.map(Js_dict.get(jsonBody$1, "ingredients"), Js_json.decodeString);
+              var match$2 = Belt_Option.map(Js_dict.get(jsonBody$1, "instructions"), Js_json.decodeString);
+              var exit = 0;
+              if (match !== undefined) {
+                var title = Caml_option.valFromOption(match);
+                if (title !== undefined && match$1 !== undefined) {
+                  var ingredients = Caml_option.valFromOption(match$1);
+                  if (ingredients !== undefined && match$2 !== undefined) {
+                    var instructions = Caml_option.valFromOption(match$2);
+                    if (instructions !== undefined) {
+                      jsonResponse["good"] = title;
+                      jsonResponse["with"] = ingredients;
+                      jsonResponse["attributes"] = instructions;
+                    } else {
+                      exit = 1;
+                    }
+                  } else {
+                    exit = 1;
+                  }
+                } else {
+                  exit = 1;
+                }
+              } else {
+                exit = 1;
+              }
+              if (exit === 1) {
+                jsonResponse["error"] = "missing attribute";
+              }
+              
+            } else {
+              jsonResponse["error"] = "not a json object";
+            }
           }
           return res.json(jsonResponse);
         }));

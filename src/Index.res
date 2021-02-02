@@ -23,7 +23,22 @@ App.post(
     let jsonResponse = Js.Dict.empty()
     switch req->Request.bodyJSON {
     | None => jsonResponse->Js.Dict.set("error", "not a json request"->Js.Json.string)
-    | Some(_json) => jsonResponse->Js.Dict.set("good", "response"->Js.Json.string)
+    | Some(json) =>
+      switch json->Js.Json.decodeObject {
+      | None => jsonResponse->Js.Dict.set("error", "not a json object"->Js.Json.string)
+      | Some(jsonBody) =>
+        switch (
+          jsonBody->Js.Dict.get("title")->Belt.Option.map(r => Js.Json.decodeString(r)),
+          jsonBody->Js.Dict.get("ingredients")->Belt.Option.map(r => Js.Json.decodeString(r)),
+          jsonBody->Js.Dict.get("instructions")->Belt.Option.map(r => Js.Json.decodeString(r)),
+        ) {
+        | (Some(Some(title)), Some(Some(ingredients)), Some(Some(instructions))) =>
+          jsonResponse->Js.Dict.set("good", title->Js.Json.string)
+          jsonResponse->Js.Dict.set("with", ingredients->Js.Json.string)
+          jsonResponse->Js.Dict.set("attributes", instructions->Js.Json.string)
+        | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
+        }
+      }
     }
 
     res->Response.sendJson(jsonResponse->Js.Json.object_)
