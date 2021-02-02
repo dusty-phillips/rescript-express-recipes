@@ -13,6 +13,17 @@ Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res)
           return Express.$$Response.status(res, /* Ok */0).json(result);
         }));
 
+Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req, res) {
+          var jsonResponse = {};
+          var _json = req.body;
+          if (_json == null) {
+            jsonResponse["error"] = "not a json request";
+          } else {
+            jsonResponse["good"] = "response";
+          }
+          return res.json(jsonResponse);
+        }));
+
 var server = Express.App.listen(app, 3000, undefined, (function (param) {
         console.log("Example app listening at http://localhost:" + (3000).toString());
         

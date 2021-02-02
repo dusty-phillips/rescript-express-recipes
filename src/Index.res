@@ -16,6 +16,20 @@ App.get(
   }),
 )
 
+App.post(
+  app,
+  ~path="/addRecipe",
+  Middleware.from((_next, req, res) => {
+    let jsonResponse = Js.Dict.empty()
+    switch req->Request.bodyJSON {
+    | None => jsonResponse->Js.Dict.set("error", "not a json request"->Js.Json.string)
+    | Some(_json) => jsonResponse->Js.Dict.set("good", "response"->Js.Json.string)
+    }
+
+    res->Response.sendJson(jsonResponse->Js.Json.object_)
+  }),
+)
+
 let server = App.listen(
   app,
   ~port,
