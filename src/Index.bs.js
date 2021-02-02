@@ -5,8 +5,12 @@ var Express = require("bs-express/src/Express.bs.js");
 
 var app = Express.express(undefined);
 
+Express.App.use(app, Express.Middleware.json(undefined, undefined, undefined, undefined));
+
 Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res) {
-          return Express.$$Response.status(res, /* Ok */0).send("Hello World");
+          var result = {};
+          result["Hello"] = "World";
+          return Express.$$Response.status(res, /* Ok */0).json(result);
         }));
 
 var server = Express.App.listen(app, 3000, undefined, (function (param) {
