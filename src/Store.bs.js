@@ -65,9 +65,28 @@ function reducer(state, action) {
   }
 }
 
+var currentState = {
+  contents: initialState
+};
+
+function getState(param) {
+  return currentState.contents;
+}
+
+function dispatch(action) {
+  currentState.contents = reducer(currentState.contents, action);
+  
+}
+
+var Reducer = {
+  getState: getState,
+  dispatch: dispatch
+};
+
 exports.initialState = initialState;
 exports.addRecipe = addRecipe;
 exports.updateTagsArray = updateTagsArray;
 exports.addTag = addTag;
 exports.reducer = reducer;
+exports.Reducer = Reducer;
 /* No side effect */

@@ -81,3 +81,16 @@ let reducer = (state: state, action: action) => {
   | AddTag({recipeId, tag}) => addTag(state, recipeId, tag)
   }
 }
+
+module type UseReducer = {
+  let getState: unit => state
+  let dispatch: action => unit
+}
+
+module Reducer: UseReducer = {
+  let currentState = ref(initialState)
+  let getState = () => currentState.contents
+  let dispatch = (action: action) => {
+    currentState.contents = reducer(currentState.contents, action)
+  }
+}
