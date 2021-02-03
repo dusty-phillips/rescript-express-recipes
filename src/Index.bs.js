@@ -67,19 +67,16 @@ Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req
 Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, req, res) {
           var jsonResponse = {};
           var state = Store.Reducer.getState(undefined);
-          var idOption = Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(req.params, "id"), Js_json.decodeString), Belt_Int.fromString);
-          if (idOption !== undefined) {
-            var recipe = Belt_MapInt.get(state.recipes, idOption);
-            if (recipe !== undefined) {
-              jsonResponse["id"] = idOption;
-              jsonResponse["title"] = recipe.title;
-              jsonResponse["ingredients"] = recipe.ingredients;
-              jsonResponse["instructions"] = recipe.instructions;
-            } else {
-              jsonResponse["error"] = "no such recipe";
-            }
+          var recipeOption = Belt_Option.flatMap(Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(req.params, "id"), Js_json.decodeString), Belt_Int.fromString), (function (id) {
+                  return Belt_MapInt.get(state.recipes, id);
+                }));
+          if (recipeOption !== undefined) {
+            jsonResponse["id"] = recipeOption.id;
+            jsonResponse["title"] = recipeOption.title;
+            jsonResponse["ingredients"] = recipeOption.ingredients;
+            jsonResponse["instructions"] = recipeOption.instructions;
           } else {
-            jsonResponse["error"] = "id must be numerical value";
+            jsonResponse["error"] = "unable to find that recipe";
           }
           return res.json(jsonResponse);
         }));

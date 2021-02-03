@@ -53,28 +53,21 @@ App.get(
     open Belt
     let jsonResponse = Js.Dict.empty()
     let state = Store.Reducer.getState()
-
-    let idOption =
+    let recipeOption =
       req
       ->Request.params
       ->Js.Dict.get("id")
       ->Option.flatMap(Js.Json.decodeString)
       ->Option.flatMap(Int.fromString)
-
-    switch idOption {
-    | Some(id) => {
-        let recipe = state.recipes->Map.Int.get(id)
-        switch recipe {
-        | None => jsonResponse->Js.Dict.set("error", "no such recipe"->Js.Json.string)
-        | Some(recipe) => {
-            jsonResponse->Js.Dict.set("id", id->Float.fromInt->Js.Json.number)
-            jsonResponse->Js.Dict.set("title", recipe.title->Js.Json.string)
-            jsonResponse->Js.Dict.set("ingredients", recipe.ingredients->Js.Json.string)
-            jsonResponse->Js.Dict.set("instructions", recipe.instructions->Js.Json.string)
-          }
-        }
+      ->Option.flatMap(id => state.recipes->Map.Int.get(id))
+    switch recipeOption {
+    | None => jsonResponse->Js.Dict.set("error", "unable to find that recipe"->Js.Json.string)
+    | Some(recipe) => {
+        jsonResponse->Js.Dict.set("id", recipe.id->Float.fromInt->Js.Json.number)
+        jsonResponse->Js.Dict.set("title", recipe.title->Js.Json.string)
+        jsonResponse->Js.Dict.set("ingredients", recipe.ingredients->Js.Json.string)
+        jsonResponse->Js.Dict.set("instructions", recipe.instructions->Js.Json.string)
       }
-    | None => jsonResponse->Js.Dict.set("error", "id must be numerical value"->Js.Json.string)
     }
     res->Response.sendJson(jsonResponse->Js.Json.object_)
   }),
