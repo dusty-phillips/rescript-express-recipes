@@ -46,6 +46,29 @@ App.post(
   }),
 )
 
+App.get(
+  app,
+  ~path="/recipes/:id",
+  Middleware.from((_next, req, res) => {
+    open Belt
+    let jsonResponse = Js.Dict.empty()
+    let state = Store.Reducer.getState()
+
+    let idOption =
+      req
+      ->Request.params
+      ->Js.Dict.get("id")
+      ->Option.flatMap(Js.Json.decodeString)
+      ->Option.flatMap(Int.fromString)
+
+    switch idOption {
+    | Some(id) => jsonResponse->Js.Dict.set("id", id->Float.fromInt->Js.Json.number)
+    | None => jsonResponse->Js.Dict.set("error", "id must be numerical value"->Js.Json.string)
+    }
+    res->Response.sendJson(jsonResponse->Js.Json.object_)
+  }),
+)
+
 let server = App.listen(
   app,
   ~port,

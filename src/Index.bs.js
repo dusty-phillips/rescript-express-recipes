@@ -5,6 +5,7 @@ var Store = require("./Store.bs.js");
 var Express = require("bs-express/src/Express.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
+var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
@@ -58,6 +59,18 @@ Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req
           }
           if (exit === 1) {
             jsonResponse["error"] = "missing attribute";
+          }
+          return res.json(jsonResponse);
+        }));
+
+Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, req, res) {
+          var jsonResponse = {};
+          Store.Reducer.getState(undefined);
+          var idOption = Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(req.params, "id"), Js_json.decodeString), Belt_Int.fromString);
+          if (idOption !== undefined) {
+            jsonResponse["id"] = idOption;
+          } else {
+            jsonResponse["error"] = "id must be numerical value";
           }
           return res.json(jsonResponse);
         }));
