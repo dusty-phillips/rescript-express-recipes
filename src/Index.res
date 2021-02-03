@@ -32,10 +32,13 @@ App.post(
       ))
 
     switch jsonFields {
-    | Some(Some(title), Some(ingredients), Some(instructions)) =>
-      jsonResponse->Js.Dict.set("good", title->Js.Json.string)
-      jsonResponse->Js.Dict.set("with", ingredients->Js.Json.string)
-      jsonResponse->Js.Dict.set("attributes", instructions->Js.Json.string)
+    | Some(Some(title), Some(ingredients), Some(instructions)) => {
+        open Store.Reducer
+        let state = getState()
+        let id = state.nextId
+        dispatch(AddRecipe({title: title, ingredients: ingredients, instructions: instructions}))
+        jsonResponse->Js.Dict.set("id", id->Js.Int.toFloat->Js.Json.number)
+      }
     | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
     }
 
