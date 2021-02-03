@@ -6,6 +6,7 @@ var Express = require("bs-express/src/Express.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
 var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
+var Belt_MapInt = require("bs-platform/lib/js/belt_MapInt.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
@@ -65,10 +66,18 @@ Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req
 
 Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, req, res) {
           var jsonResponse = {};
-          Store.Reducer.getState(undefined);
+          var state = Store.Reducer.getState(undefined);
           var idOption = Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(req.params, "id"), Js_json.decodeString), Belt_Int.fromString);
           if (idOption !== undefined) {
-            jsonResponse["id"] = idOption;
+            var recipe = Belt_MapInt.get(state.recipes, idOption);
+            if (recipe !== undefined) {
+              jsonResponse["id"] = idOption;
+              jsonResponse["title"] = recipe.title;
+              jsonResponse["ingredients"] = recipe.ingredients;
+              jsonResponse["instructions"] = recipe.instructions;
+            } else {
+              jsonResponse["error"] = "no such recipe";
+            }
           } else {
             jsonResponse["error"] = "id must be numerical value";
           }
