@@ -9,6 +9,7 @@ var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
 var Belt_MapInt = require("bs-platform/lib/js/belt_MapInt.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var Belt_MapString = require("bs-platform/lib/js/belt_MapString.js");
 
 var app = Express.express(undefined);
 
@@ -118,6 +119,12 @@ Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, re
           } else {
             jsonResponse["error"] = "unable to find that recipe";
           }
+          return res.json(jsonResponse);
+        }));
+
+Express.App.get(app, "/allTags", Express.Middleware.from(function (_next, _req, res) {
+          var jsonResponse = {};
+          jsonResponse["tags"] = Belt_MapString.keysToArray(Store.Reducer.getState(undefined).tags);
           return res.json(jsonResponse);
         }));
 

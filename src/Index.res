@@ -106,6 +106,18 @@ App.get(
   }),
 )
 
+App.get(
+  app,
+  ~path="/allTags",
+  Middleware.from((_next, _req, res) => {
+    let jsonResponse = Js.Dict.empty()
+    jsonResponse->Js.Dict.set(
+      "tags",
+      Store.Reducer.getState().tags->Belt.Map.String.keysToArray->Js.Json.stringArray,
+    )
+    res->Response.sendJson(jsonResponse->Js.Json.object_)
+  }),
+)
 let server = App.listen(
   app,
   ~port,
