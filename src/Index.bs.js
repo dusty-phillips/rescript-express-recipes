@@ -64,6 +64,45 @@ Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req
           return res.json(jsonResponse);
         }));
 
+Express.App.post(app, "/addTagToRecipe", Express.Middleware.from(function (_next, req, res) {
+          var jsonResponse = {};
+          var jsonFields = Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(req.body), Js_json.decodeObject), (function (jsonBody) {
+                  return [
+                          Belt_Option.flatMap(Belt_Option.map(Belt_Option.flatMap(Js_dict.get(jsonBody, "recipeId"), Js_json.decodeNumber), (function (prim) {
+                                      return prim | 0;
+                                    })), (function (id) {
+                                  return Belt_MapInt.get(Store.Reducer.getState(undefined).recipes, id);
+                                })),
+                          Belt_Option.flatMap(Js_dict.get(jsonBody, "tag"), Js_json.decodeString)
+                        ];
+                }));
+          var exit = 0;
+          if (jsonFields !== undefined) {
+            var recipe = jsonFields[0];
+            if (recipe !== undefined) {
+              var tag = jsonFields[1];
+              if (tag !== undefined) {
+                jsonResponse["success"] = true;
+                Store.Reducer.dispatch({
+                      TAG: /* AddTag */1,
+                      recipeId: recipe.id,
+                      tag: tag
+                    });
+              } else {
+                exit = 1;
+              }
+            } else {
+              exit = 1;
+            }
+          } else {
+            exit = 1;
+          }
+          if (exit === 1) {
+            jsonResponse["error"] = "invalid request";
+          }
+          return res.json(jsonResponse);
+        }));
+
 Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, req, res) {
           var jsonResponse = {};
           var state = Store.Reducer.getState(undefined);
@@ -75,6 +114,7 @@ Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, re
             jsonResponse["title"] = recipeOption.title;
             jsonResponse["ingredients"] = recipeOption.ingredients;
             jsonResponse["instructions"] = recipeOption.instructions;
+            jsonResponse["tags"] = recipeOption.tags;
           } else {
             jsonResponse["error"] = "unable to find that recipe";
           }

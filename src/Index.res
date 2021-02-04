@@ -46,6 +46,38 @@ App.post(
   }),
 )
 
+App.post(
+  app,
+  ~path="/addTagToRecipe",
+  Middleware.from((_next, req, res) => {
+    open Belt
+    open Store.Reducer
+    let jsonResponse = Js.Dict.empty()
+
+    let jsonFields =
+      req
+      ->Request.bodyJSON
+      ->Option.flatMap(Js.Json.decodeObject)
+      ->Option.map(jsonBody => (
+        jsonBody
+        ->Js.Dict.get("recipeId")
+        ->Option.flatMap(Js.Json.decodeNumber)
+        ->Option.map(Int.fromFloat)
+        ->Option.flatMap(id => getState().recipes->Map.Int.get(id)),
+        jsonBody->Js.Dict.get("tag")->Option.flatMap(Js.Json.decodeString),
+      ))
+
+    switch jsonFields {
+    | Some(Some(recipe), Some(tag)) => {
+        jsonResponse->Js.Dict.set("success", true->Js.Json.boolean)
+        dispatch(AddTag({recipeId: recipe.id, tag: tag}))
+      }
+    | _ => jsonResponse->Js.Dict.set("error", "invalid request"->Js.Json.string)
+    }
+    res->Response.sendJson(jsonResponse->Js.Json.object_)
+  }),
+)
+
 App.get(
   app,
   ~path="/recipes/:id",
@@ -67,6 +99,7 @@ App.get(
         jsonResponse->Js.Dict.set("title", recipe.title->Js.Json.string)
         jsonResponse->Js.Dict.set("ingredients", recipe.ingredients->Js.Json.string)
         jsonResponse->Js.Dict.set("instructions", recipe.instructions->Js.Json.string)
+        jsonResponse->Js.Dict.set("tags", recipe.tags->Js.Json.stringArray)
       }
     }
     res->Response.sendJson(jsonResponse->Js.Json.object_)
