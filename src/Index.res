@@ -118,6 +118,46 @@ App.get(
     res->Response.sendJson(jsonResponse->Js.Json.object_)
   }),
 )
+
+App.get(
+  app,
+  ~path="/tags/:tag",
+  Middleware.from((_next, req, res) => {
+    open Belt
+    let jsonResponse = Js.Dict.empty()
+    let state = Store.Reducer.getState()
+    let taggedRecipesOption =
+      req
+      ->Request.params
+      ->Js.Dict.get("tag")
+      ->Option.flatMap(Js.Json.decodeString)
+      ->Option.flatMap(tag => state.tags->Map.String.get(tag))
+
+    switch taggedRecipesOption {
+    | None => jsonResponse->Js.Dict.set("error", "tag not found"->Js.Json.string)
+    | Some(recipeIds) => {
+        let recipes =
+          recipeIds
+          ->Array.map(id => {
+            state.recipes
+            ->Map.Int.get(id)
+            ->Option.map(recipe => {
+              let dict = Js.Dict.empty()
+              dict->Js.Dict.set("id", id->Js.Int.toFloat->Js.Json.number)
+              dict->Js.Dict.set("title", recipe.title->Js.Json.string)
+              dict
+            })
+          })
+          ->Array.keep(value => value->Option.isSome)
+          ->Array.map(opt => opt->Option.getUnsafe->Js.Json.object_)
+          ->Js.Json.array
+        jsonResponse->Js.Dict.set("recipes", recipes)
+      }
+    }
+    res->Response.sendJson(jsonResponse->Js.Json.object_)
+  }),
+)
+
 let server = App.listen(
   app,
   ~port,

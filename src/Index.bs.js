@@ -6,6 +6,7 @@ var Express = require("bs-express/src/Express.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
 var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
+var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var Belt_MapInt = require("bs-platform/lib/js/belt_MapInt.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
@@ -125,6 +126,30 @@ Express.App.get(app, "/recipes/:id", Express.Middleware.from(function (_next, re
 Express.App.get(app, "/allTags", Express.Middleware.from(function (_next, _req, res) {
           var jsonResponse = {};
           jsonResponse["tags"] = Belt_MapString.keysToArray(Store.Reducer.getState(undefined).tags);
+          return res.json(jsonResponse);
+        }));
+
+Express.App.get(app, "/tags/:tag", Express.Middleware.from(function (_next, req, res) {
+          var jsonResponse = {};
+          var state = Store.Reducer.getState(undefined);
+          var taggedRecipesOption = Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(req.params, "tag"), Js_json.decodeString), (function (tag) {
+                  return Belt_MapString.get(state.tags, tag);
+                }));
+          if (taggedRecipesOption !== undefined) {
+            var recipes = Belt_Array.map(Belt_Array.keep(Belt_Array.map(taggedRecipesOption, (function (id) {
+                            return Belt_Option.map(Belt_MapInt.get(state.recipes, id), (function (recipe) {
+                                          var dict = {};
+                                          dict["id"] = id;
+                                          dict["title"] = recipe.title;
+                                          return dict;
+                                        }));
+                          })), Belt_Option.isSome), (function (opt) {
+                    return opt;
+                  }));
+            jsonResponse["recipes"] = recipes;
+          } else {
+            jsonResponse["error"] = "tag not found";
+          }
           return res.json(jsonResponse);
         }));
 
