@@ -19,46 +19,38 @@ Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res)
 
 Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req, res) {
           var jsonResponse = {};
-          var json = req.body;
-          if (json == null) {
-            jsonResponse["error"] = "not a json request";
-          } else {
-            var jsonBody = Js_json.decodeObject(json);
-            if (jsonBody !== undefined) {
-              var jsonBody$1 = Caml_option.valFromOption(jsonBody);
-              var match = Belt_Option.map(Js_dict.get(jsonBody$1, "title"), Js_json.decodeString);
-              var match$1 = Belt_Option.map(Js_dict.get(jsonBody$1, "ingredients"), Js_json.decodeString);
-              var match$2 = Belt_Option.map(Js_dict.get(jsonBody$1, "instructions"), Js_json.decodeString);
-              var exit = 0;
-              if (match !== undefined) {
-                var title = Caml_option.valFromOption(match);
-                if (title !== undefined && match$1 !== undefined) {
-                  var ingredients = Caml_option.valFromOption(match$1);
-                  if (ingredients !== undefined && match$2 !== undefined) {
-                    var instructions = Caml_option.valFromOption(match$2);
-                    if (instructions !== undefined) {
-                      jsonResponse["good"] = title;
-                      jsonResponse["with"] = ingredients;
-                      jsonResponse["attributes"] = instructions;
-                    } else {
-                      exit = 1;
-                    }
-                  } else {
-                    exit = 1;
-                  }
+          var jsonFields = Belt_Option.map(Belt_Option.flatMap(Caml_option.nullable_to_opt(req.body), Js_json.decodeObject), (function (jsonBody) {
+                  return [
+                          Belt_Option.flatMap(Js_dict.get(jsonBody, "title"), Js_json.decodeString),
+                          Belt_Option.flatMap(Js_dict.get(jsonBody, "ingredients"), Js_json.decodeString),
+                          Belt_Option.flatMap(Js_dict.get(jsonBody, "instructions"), Js_json.decodeString)
+                        ];
+                }));
+          var exit = 0;
+          if (jsonFields !== undefined) {
+            var title = jsonFields[0];
+            if (title !== undefined) {
+              var ingredients = jsonFields[1];
+              if (ingredients !== undefined) {
+                var instructions = jsonFields[2];
+                if (instructions !== undefined) {
+                  jsonResponse["good"] = title;
+                  jsonResponse["with"] = ingredients;
+                  jsonResponse["attributes"] = instructions;
                 } else {
                   exit = 1;
                 }
               } else {
                 exit = 1;
               }
-              if (exit === 1) {
-                jsonResponse["error"] = "missing attribute";
-              }
-              
             } else {
-              jsonResponse["error"] = "not a json object";
+              exit = 1;
             }
+          } else {
+            exit = 1;
+          }
+          if (exit === 1) {
+            jsonResponse["error"] = "missing attribute";
           }
           return res.json(jsonResponse);
         }));

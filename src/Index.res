@@ -21,24 +21,22 @@ App.post(
   ~path="/addRecipe",
   Middleware.from((_next, req, res) => {
     let jsonResponse = Js.Dict.empty()
-    switch req->Request.bodyJSON {
-    | None => jsonResponse->Js.Dict.set("error", "not a json request"->Js.Json.string)
-    | Some(json) =>
-      switch json->Js.Json.decodeObject {
-      | None => jsonResponse->Js.Dict.set("error", "not a json object"->Js.Json.string)
-      | Some(jsonBody) =>
-        switch (
-          jsonBody->Js.Dict.get("title")->Belt.Option.map(r => Js.Json.decodeString(r)),
-          jsonBody->Js.Dict.get("ingredients")->Belt.Option.map(r => Js.Json.decodeString(r)),
-          jsonBody->Js.Dict.get("instructions")->Belt.Option.map(r => Js.Json.decodeString(r)),
-        ) {
-        | (Some(Some(title)), Some(Some(ingredients)), Some(Some(instructions))) =>
-          jsonResponse->Js.Dict.set("good", title->Js.Json.string)
-          jsonResponse->Js.Dict.set("with", ingredients->Js.Json.string)
-          jsonResponse->Js.Dict.set("attributes", instructions->Js.Json.string)
-        | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
-        }
-      }
+    let jsonFields =
+      req
+      ->Request.bodyJSON
+      ->Belt.Option.flatMap(Js.Json.decodeObject)
+      ->Belt.Option.map(jsonBody => (
+        jsonBody->Js.Dict.get("title")->Belt.Option.flatMap(Js.Json.decodeString),
+        jsonBody->Js.Dict.get("ingredients")->Belt.Option.flatMap(Js.Json.decodeString),
+        jsonBody->Js.Dict.get("instructions")->Belt.Option.flatMap(Js.Json.decodeString),
+      ))
+
+    switch jsonFields {
+    | Some(Some(title), Some(ingredients), Some(instructions)) =>
+      jsonResponse->Js.Dict.set("good", title->Js.Json.string)
+      jsonResponse->Js.Dict.set("with", ingredients->Js.Json.string)
+      jsonResponse->Js.Dict.set("attributes", instructions->Js.Json.string)
+    | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
     }
 
     res->Response.sendJson(jsonResponse->Js.Json.object_)
