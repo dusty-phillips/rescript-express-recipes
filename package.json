@@ -13,7 +13,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "bs-platform": "^8.4.2"
+    "bs-platform": "^9.0.1"
   },
   "dependencies": {
     "bs-express": "github:reasonml-community/bs-express"
