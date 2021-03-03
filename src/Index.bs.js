@@ -2,19 +2,28 @@
 'use strict';
 
 var Store = require("./Store.bs.js");
+var Schema = require("./Schema.bs.js");
 var Express = require("bs-express/src/Express.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
 var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
+var Resolvers = require("./Resolvers.bs.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var Belt_MapInt = require("bs-platform/lib/js/belt_MapInt.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Belt_MapString = require("bs-platform/lib/js/belt_MapString.js");
+var ExpressGraphql = require("express-graphql");
 
 var app = Express.express(undefined);
 
 Express.App.use(app, Express.Middleware.json(undefined, undefined, undefined, undefined));
+
+Express.App.useOnPath(app, "/graphql", ExpressGraphql.graphqlHTTP({
+          schema: Schema.schema,
+          graphiql: true,
+          rootValue: Resolvers.rootValue
+        }));
 
 Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res) {
           var result = {};

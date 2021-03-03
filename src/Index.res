@@ -5,6 +5,16 @@ let port = 3000
 
 App.use(app, Middleware.json())
 
+App.useOnPath(
+  app,
+  ~path="/graphql",
+  GraphqlExpress.graphqlHttp({
+    schema: Schema.schema,
+    graphiql: true,
+    rootValue: Resolvers.rootValue,
+  }),
+)
+
 App.get(
   app,
   ~path="/",
