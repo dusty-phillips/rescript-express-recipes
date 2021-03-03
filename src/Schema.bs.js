@@ -3,7 +3,7 @@
 
 var Graphql = require("graphql");
 
-var schema = Graphql.buildSchema("\n  type Query {\n    hello: String\n  }\n");
+var schema = Graphql.buildSchema("\n  type Query {\n    hello: String\n    greetByName(name: String): String\n  }\n");
 
 exports.schema = schema;
 /* schema Not a pure module */

@@ -6,10 +6,16 @@ function hello(param) {
   return "hello world";
 }
 
+function greetByName(param) {
+  return "Hello " + param.name;
+}
+
 var rootValue = {
-  hello: hello
+  hello: hello,
+  greetByName: greetByName
 };
 
 exports.hello = hello;
+exports.greetByName = greetByName;
 exports.rootValue = rootValue;
 /* No side effect */
