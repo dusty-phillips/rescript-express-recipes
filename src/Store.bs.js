@@ -16,17 +16,29 @@ function addRecipe(state, id, title, ingredients, instructions) {
                 title: title,
                 ingredients: ingredients,
                 instructions: instructions,
-                tags: []
+                tags: [],
+                updatedAt: Date.now(),
+                deleted: false
               }),
           tags: state.tags
         };
 }
 
-function updateTagsArray(taggedRecipesOption, recipeId) {
+function createOrUpdateTaggedRecipes(taggedRecipesOption, tag, recipeId) {
   if (taggedRecipesOption !== undefined) {
-    return Belt_Array.concat(taggedRecipesOption, [recipeId]);
+    return {
+            tag: taggedRecipesOption.tag,
+            recipes: Belt_Array.concat(taggedRecipesOption.recipes, [recipeId]),
+            updatedAt: Date.now(),
+            deleted: taggedRecipesOption.deleted
+          };
   } else {
-    return [recipeId];
+    return {
+            tag: tag,
+            recipes: [recipeId],
+            updatedAt: Date.now(),
+            deleted: false
+          };
   }
 }
 
@@ -41,10 +53,12 @@ function addTag(state, recipeId, tag) {
         title: recipeOption.title,
         ingredients: recipeOption.ingredients,
         instructions: recipeOption.instructions,
-        tags: recipeTags
+        tags: recipeTags,
+        updatedAt: recipeOption.updatedAt,
+        deleted: recipeOption.deleted
       });
   var tags = Belt_MapString.update(state.tags, tag, (function (taggedRecipesOption) {
-          return updateTagsArray(taggedRecipesOption, recipeOption.id);
+          return createOrUpdateTaggedRecipes(taggedRecipesOption, tag, recipeOption.id);
         }));
   return {
           recipes: recipes,
@@ -80,7 +94,7 @@ var Reducer = {
 
 exports.initialState = initialState;
 exports.addRecipe = addRecipe;
-exports.updateTagsArray = updateTagsArray;
+exports.createOrUpdateTaggedRecipes = createOrUpdateTaggedRecipes;
 exports.addTag = addTag;
 exports.reducer = reducer;
 exports.Reducer = Reducer;

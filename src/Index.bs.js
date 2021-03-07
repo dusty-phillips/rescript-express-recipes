@@ -142,7 +142,7 @@ Express.App.get(app, "/tags/:tag", Express.Middleware.from(function (_next, req,
                   return Belt_MapString.get(state.tags, tag);
                 }));
           if (taggedRecipesOption !== undefined) {
-            var recipes = Belt_Array.map(Belt_Array.keep(Belt_Array.map(taggedRecipesOption, (function (id) {
+            var recipes = Belt_Array.map(Belt_Array.keep(Belt_Array.map(taggedRecipesOption.recipes, (function (id) {
                             return Belt_Option.map(Belt_MapString.get(state.recipes, id), (function (recipe) {
                                           var dict = {};
                                           dict["id"] = id;

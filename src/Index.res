@@ -144,9 +144,9 @@ App.get(
 
     switch taggedRecipesOption {
     | None => jsonResponse->Js.Dict.set("error", "tag not found"->Js.Json.string)
-    | Some(recipeIds) => {
+    | Some(taggedRecipes) => {
         let recipes =
-          recipeIds
+          taggedRecipes.recipes
           ->Array.map(id => {
             state.recipes
             ->Map.String.get(id)

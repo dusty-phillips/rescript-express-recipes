@@ -14,11 +14,20 @@ type recipe = {
   ingredients: ingredients,
   instructions: instructions,
   tags: array<tag>,
+  updatedAt: float,
+  deleted: bool,
+}
+
+type taggedRecipes = {
+  tag: tag,
+  recipes: array<id>,
+  updatedAt: float,
+  deleted: bool,
 }
 
 type state = {
   recipes: Map.String.t<recipe>,
-  tags: Map.String.t<array<id>>,
+  tags: Map.String.t<taggedRecipes>,
 }
 
 let initialState: state = {
@@ -46,16 +55,33 @@ let addRecipe = (
         ingredients: ingredients,
         instructions: instructions,
         tags: [],
+        updatedAt: Js.Date.now(),
+        deleted: false,
       },
     ),
     tags: state.tags,
   }
 }
 
-let updateTagsArray = (taggedRecipesOption: option<array<id>>, recipeId: id) => {
+let createOrUpdateTaggedRecipes = (
+  taggedRecipesOption: option<taggedRecipes>,
+  tag: tag,
+  recipeId: id,
+): option<taggedRecipes> => {
   switch taggedRecipesOption {
-  | None => Some([recipeId])
-  | Some(taggedRecipes) => Some(taggedRecipes->Array.concat([recipeId]))
+  | None =>
+    Some({
+      tag: tag,
+      recipes: [recipeId],
+      deleted: false,
+      updatedAt: Js.Date.now(),
+    })
+  | Some(taggedRecipes) =>
+    Some({
+      ...taggedRecipes,
+      updatedAt: Js.Date.now(),
+      recipes: taggedRecipes.recipes->Array.concat([recipeId]),
+    })
   }
 }
 
@@ -70,7 +96,7 @@ let addTag = (state: state, recipeId: id, tag: tag) => {
 
       let tags =
         state.tags->Map.String.update(tag, taggedRecipesOption =>
-          updateTagsArray(taggedRecipesOption, recipe.id)
+          createOrUpdateTaggedRecipes(taggedRecipesOption, tag, recipe.id)
         )
 
       {
