@@ -44,10 +44,11 @@ App.post(
     switch jsonFields {
     | Some(Some(title), Some(ingredients), Some(instructions)) => {
         open Store.Reducer
-        let state = getState()
-        let id = state.nextId
-        dispatch(AddRecipe({title: title, ingredients: ingredients, instructions: instructions}))
-        jsonResponse->Js.Dict.set("id", id->Js.Int.toFloat->Js.Json.number)
+        let id = Store.uuid()
+        dispatch(
+          AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions}),
+        )
+        jsonResponse->Js.Dict.set("id", id->Js.Json.string)
       }
     | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
     }
@@ -71,9 +72,8 @@ App.post(
       ->Option.map(jsonBody => (
         jsonBody
         ->Js.Dict.get("recipeId")
-        ->Option.flatMap(Js.Json.decodeNumber)
-        ->Option.map(Int.fromFloat)
-        ->Option.flatMap(id => getState().recipes->Map.Int.get(id)),
+        ->Option.flatMap(Js.Json.decodeString)
+        ->Option.flatMap(id => getState().recipes->Map.String.get(id)),
         jsonBody->Js.Dict.get("tag")->Option.flatMap(Js.Json.decodeString),
       ))
 
@@ -100,12 +100,11 @@ App.get(
       ->Request.params
       ->Js.Dict.get("id")
       ->Option.flatMap(Js.Json.decodeString)
-      ->Option.flatMap(Int.fromString)
-      ->Option.flatMap(id => state.recipes->Map.Int.get(id))
+      ->Option.flatMap(id => state.recipes->Map.String.get(id))
     switch recipeOption {
     | None => jsonResponse->Js.Dict.set("error", "unable to find that recipe"->Js.Json.string)
     | Some(recipe) => {
-        jsonResponse->Js.Dict.set("id", recipe.id->Float.fromInt->Js.Json.number)
+        jsonResponse->Js.Dict.set("id", recipe.id->Js.Json.string)
         jsonResponse->Js.Dict.set("title", recipe.title->Js.Json.string)
         jsonResponse->Js.Dict.set("ingredients", recipe.ingredients->Js.Json.string)
         jsonResponse->Js.Dict.set("instructions", recipe.instructions->Js.Json.string)
@@ -150,10 +149,10 @@ App.get(
           recipeIds
           ->Array.map(id => {
             state.recipes
-            ->Map.Int.get(id)
+            ->Map.String.get(id)
             ->Option.map(recipe => {
               let dict = Js.Dict.empty()
-              dict->Js.Dict.set("id", id->Js.Int.toFloat->Js.Json.number)
+              dict->Js.Dict.set("id", id->Js.Json.string)
               dict->Js.Dict.set("title", recipe.title->Js.Json.string)
               dict
             })
