@@ -1,24 +1,26 @@
 open Belt
 
-type id = int
+type id = string
+type title = string
+type ingredients = string
+type instructions = string
+type tag = string
 
 type recipe = {
   id: id,
-  title: string,
-  ingredients: string,
-  instructions: string,
-  tags: array<string>,
+  title: title,
+  ingredients: ingredients,
+  instructions: instructions,
+  tags: array<tag>,
 }
 
 type state = {
-  nextId: id,
-  recipes: Map.Int.t<recipe>,
-  tags: Map.String.t<array<int>>,
+  recipes: Map.String.t<recipe>,
+  tags: Map.String.t<array<id>>,
 }
 
 let initialState: state = {
-  nextId: 0,
-  recipes: Map.Int.empty,
+  recipes: Map.String.empty,
   tags: Map.String.empty,
 }
 
