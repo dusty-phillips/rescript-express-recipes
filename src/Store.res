@@ -1,3 +1,5 @@
+@module("uuid") external uuid: unit => string = "v4"
+
 open Belt
 
 type id = string
@@ -26,12 +28,12 @@ let initialState: state = {
 
 type action =
   | AddRecipe({title: string, ingredients: string, instructions: string})
-  | AddTag({recipeId: int, tag: string})
+  | AddTag({recipeId: id, tag: string})
 
 let addRecipe = (state: state, title: string, ingredients: string, instructions: string) => {
-  let id = state.nextId
+  let id = uuid()
   {
-    recipes: state.recipes->Map.Int.set(
+    recipes: state.recipes->Map.String.set(
       id,
       {
         id: id,
@@ -41,26 +43,25 @@ let addRecipe = (state: state, title: string, ingredients: string, instructions:
         tags: [],
       },
     ),
-    nextId: state.nextId + 1,
     tags: state.tags,
   }
 }
 
-let updateTagsArray = (taggedRecipesOption: option<array<int>>, recipeId: int) => {
+let updateTagsArray = (taggedRecipesOption: option<array<id>>, recipeId: id) => {
   switch taggedRecipesOption {
   | None => Some([recipeId])
   | Some(taggedRecipes) => Some(taggedRecipes->Array.concat([recipeId]))
   }
 }
 
-let addTag = (state: state, recipeId: int, tag: string) => {
-  let recipeOption = state.recipes->Map.Int.get(recipeId)
+let addTag = (state: state, recipeId: id, tag: string) => {
+  let recipeOption = state.recipes->Map.String.get(recipeId)
 
   switch recipeOption {
   | None => state
   | Some(recipe) => {
       let recipeTags = recipe.tags->Array.concat([tag])
-      let recipes = state.recipes->Map.Int.set(recipe.id, {...recipe, tags: recipeTags})
+      let recipes = state.recipes->Map.String.set(recipe.id, {...recipe, tags: recipeTags})
 
       let tags =
         state.tags->Map.String.update(tag, taggedRecipesOption =>
@@ -68,7 +69,6 @@ let addTag = (state: state, recipeId: int, tag: string) => {
         )
 
       {
-        nextId: state.nextId,
         recipes: recipes,
         tags: tags,
       }
