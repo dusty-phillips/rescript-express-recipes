@@ -2,20 +2,47 @@
 'use strict';
 
 
-function hello(param) {
-  return "hello world";
+function recipeRxDbFeed(param) {
+  return [];
 }
 
-function greetByName(param) {
-  return "Hello " + param.name;
+function taggedRecipesRxDbFeed(param) {
+  return [];
+}
+
+function setRecipe(param) {
+  var recipe = param.recipe;
+  return {
+          id: recipe.id,
+          title: recipe.title,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          tags: recipe.tags,
+          updatedAt: Date.now(),
+          deleted: recipe.deleted
+        };
+}
+
+function setTaggedRecipes(param) {
+  var taggedRecipes = param.taggedRecipes;
+  return {
+          tag: taggedRecipes.tag,
+          recipes: taggedRecipes.recipes,
+          updatedAt: Date.now(),
+          deleted: taggedRecipes.deleted
+        };
 }
 
 var rootValue = {
-  hello: hello,
-  greetByName: greetByName
+  recipeRxDbFeed: recipeRxDbFeed,
+  taggedRecipesRxDbFeed: taggedRecipesRxDbFeed,
+  setRecipe: setRecipe,
+  setTaggedRecipes: setTaggedRecipes
 };
 
-exports.hello = hello;
-exports.greetByName = greetByName;
+exports.recipeRxDbFeed = recipeRxDbFeed;
+exports.taggedRecipesRxDbFeed = taggedRecipesRxDbFeed;
+exports.setRecipe = setRecipe;
+exports.setTaggedRecipes = setTaggedRecipes;
 exports.rootValue = rootValue;
 /* No side effect */
