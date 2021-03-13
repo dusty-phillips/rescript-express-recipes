@@ -1,10 +1,31 @@
 type t
 
-type greetByNameArgs = {name: string}
+type recipesRxDbFeedInput = {id: Store.id, minUpdatedAt: float, limit: int}
+type taggedRecipesRxDbFeedInput = {tag: Store.tag, minUpdatedAt: float, limit: int}
+
+type recipeInputFields = {
+  id: Store.id,
+  title: Store.title,
+  ingredients: Store.ingredients,
+  instructions: Store.instructions,
+  tags: array<Store.tag>,
+  deleted: bool,
+}
+
+type taggedRecipesInputFields = {
+  tag: Store.tag,
+  recipes: array<Store.id>,
+  deleted: bool,
+}
+
+type recipeInput = {recipe: recipeInputFields}
+type taggedRecipesInput = {taggedRecipes: taggedRecipesInputFields}
 
 type rootValue = {
-  hello: unit => string,
-  greetByName: greetByNameArgs => string,
+  recipeRxDbFeed: recipesRxDbFeedInput => array<Store.recipe>,
+  taggedRecipesRxDbFeed: taggedRecipesRxDbFeedInput => array<Store.taggedRecipes>,
+  setRecipe: recipeInput => Store.recipe,
+  setTaggedRecipes: taggedRecipesInput => Store.taggedRecipes,
 }
 
 @module("graphql") external buildSchema: string => t = "buildSchema"
@@ -36,7 +57,7 @@ let schema = buildSchema(`
 
     taggedRecipesRxDbFeed(
       tag: String!
-      minUpdatedAt: Int!
+      minUpdatedAt: Float!
       limit: Int!
     ): [TaggedRecipes!]!
   }
