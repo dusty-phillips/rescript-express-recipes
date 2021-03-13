@@ -1,5 +1,30 @@
+open Belt
+
 let recipeRxDbFeed = ({id, minUpdatedAt, limit}: Schema.recipesRxDbFeedInput) => {
-  []
+  Store.Reducer.getState().recipes
+  ->Map.String.valuesToArray
+  ->Array.keep(r => {
+    Js.log3(r, minUpdatedAt, id)
+    if r.updatedAt == minUpdatedAt {
+      r.id > id
+    } else {
+      r.updatedAt > minUpdatedAt
+    }
+  })
+  ->SortArray.stableSortBy((r1, r2) => {
+    if r1.updatedAt > r2.updatedAt {
+      1
+    } else if r1.updatedAt < r2.updatedAt {
+      -1
+    } else if r1.id > r2.id {
+      1
+    } else if r1.id < r2.id {
+      -1
+    } else {
+      0
+    }
+  })
+  ->Array.slice(~offset=0, ~len=limit)
 }
 
 let taggedRecipesRxDbFeed = ({tag, minUpdatedAt, limit}: Schema.taggedRecipesRxDbFeedInput) => {
