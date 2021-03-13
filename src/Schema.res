@@ -13,8 +13,52 @@ type rootValue = {
 external graphql: (t, string, rootValue) => Js.Promise.t<'result> = "graphql"
 
 let schema = buildSchema(`
+  type Recipe {
+    id: String!,
+    title: String!,
+    ingredients: String!,
+    instructions: String!,
+    tags: [String]!,
+    updatedAt: Float!,
+    deleted: Boolean!,
+
+  }
+
+  type TaggedRecipes {
+    tag: String!,
+    recipes: [String]!,
+    updatedAt: Float!,
+    deleted: Boolean!,
+  }
+
   type Query {
-    hello: String
-    greetByName(name: String): String
+    recipeRxDbFeed(id: String!, minUpdatedAt: Float!, limit: Int!): [Recipe!]!
+
+    taggedRecipesRxDbFeed(
+      tag: String!
+      minUpdatedAt: Int!
+      limit: Int!
+    ): [TaggedRecipes!]!
+  }
+
+  input RecipeInput {
+    id: String!,
+    title: String!,
+    ingredients: String!,
+    instructions: String!,
+    tags: [String]!,
+    deleted: Boolean!,
+
+  }
+
+  input TaggedRecipesInput {
+    tag: String!,
+    recipes: [String]!,
+    deleted: Boolean!,
+  }
+
+  type Mutation {
+    setRecipe(recipe: RecipeInput!): Recipe!
+    setTaggedRecipes(taggedRecipes: TaggedRecipesInput!): TaggedRecipes!
   }
 `)
