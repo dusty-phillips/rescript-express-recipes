@@ -56,15 +56,27 @@ function taggedRecipesRxDbFeed(param) {
 
 function setRecipe(param) {
   var recipe = param.recipe;
-  return {
-          id: recipe.id,
-          title: recipe.title,
-          ingredients: recipe.ingredients,
-          instructions: recipe.instructions,
-          tags: recipe.tags,
-          updatedAt: Date.now(),
-          deleted: recipe.deleted
-        };
+  var result_id = recipe.id;
+  var result_title = recipe.title;
+  var result_ingredients = recipe.ingredients;
+  var result_instructions = recipe.instructions;
+  var result_tags = recipe.tags;
+  var result_updatedAt = Date.now();
+  var result_deleted = recipe.deleted;
+  var result = {
+    id: result_id,
+    title: result_title,
+    ingredients: result_ingredients,
+    instructions: result_instructions,
+    tags: result_tags,
+    updatedAt: result_updatedAt,
+    deleted: result_deleted
+  };
+  Store.Reducer.dispatch({
+        TAG: /* SetRecipe */2,
+        _0: result
+      });
+  return result;
 }
 
 function setTaggedRecipes(param) {

@@ -53,13 +53,17 @@ let taggedRecipesRxDbFeed = ({tag, minUpdatedAt, limit}: Schema.taggedRecipesRxD
 }
 
 let setRecipe = ({recipe}: Schema.recipeInput): Store.recipe => {
-  id: recipe.id,
-  title: recipe.title,
-  ingredients: recipe.ingredients,
-  instructions: recipe.instructions,
-  tags: recipe.tags,
-  deleted: recipe.deleted,
-  updatedAt: Js.Date.now(),
+  let result: Store.recipe = {
+    id: recipe.id,
+    title: recipe.title,
+    ingredients: recipe.ingredients,
+    instructions: recipe.instructions,
+    tags: recipe.tags,
+    deleted: recipe.deleted,
+    updatedAt: Js.Date.now(),
+  }
+  Store.Reducer.dispatch(SetRecipe(result))
+  result
 }
 
 let setTaggedRecipes = ({taggedRecipes}: Schema.taggedRecipesInput): Store.taggedRecipes => {
