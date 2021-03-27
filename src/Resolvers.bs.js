@@ -10,7 +10,6 @@ function recipeRxDbFeed(param) {
   var minUpdatedAt = param.minUpdatedAt;
   var id = param.id;
   return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.keep(Belt_MapString.valuesToArray(Store.Reducer.getState(undefined).recipes), (function (r) {
-                        console.log(r, minUpdatedAt, id);
                         if (r.updatedAt === minUpdatedAt) {
                           return r.id > id;
                         } else {
@@ -32,7 +31,27 @@ function recipeRxDbFeed(param) {
 }
 
 function taggedRecipesRxDbFeed(param) {
-  return [];
+  var minUpdatedAt = param.minUpdatedAt;
+  var tag = param.tag;
+  return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.keep(Belt_MapString.valuesToArray(Store.Reducer.getState(undefined).tags), (function (r) {
+                        if (r.updatedAt === minUpdatedAt) {
+                          return r.tag > tag;
+                        } else {
+                          return r.updatedAt > minUpdatedAt;
+                        }
+                      })), (function (r1, r2) {
+                    if (r1.updatedAt > r2.updatedAt) {
+                      return 1;
+                    } else if (r1.updatedAt < r2.updatedAt) {
+                      return -1;
+                    } else if (r1.tag > r2.tag) {
+                      return 1;
+                    } else if (r1.tag < r2.tag) {
+                      return -1;
+                    } else {
+                      return 0;
+                    }
+                  })), 0, param.limit);
 }
 
 function setRecipe(param) {

@@ -4,7 +4,6 @@ let recipeRxDbFeed = ({id, minUpdatedAt, limit}: Schema.recipesRxDbFeedInput) =>
   Store.Reducer.getState().recipes
   ->Map.String.valuesToArray
   ->Array.keep(r => {
-    Js.log3(r, minUpdatedAt, id)
     if r.updatedAt == minUpdatedAt {
       r.id > id
     } else {
@@ -28,7 +27,29 @@ let recipeRxDbFeed = ({id, minUpdatedAt, limit}: Schema.recipesRxDbFeedInput) =>
 }
 
 let taggedRecipesRxDbFeed = ({tag, minUpdatedAt, limit}: Schema.taggedRecipesRxDbFeedInput) => {
-  []
+  Store.Reducer.getState().tags
+  ->Map.String.valuesToArray
+  ->Array.keep(r => {
+    if r.updatedAt == minUpdatedAt {
+      r.tag > tag
+    } else {
+      r.updatedAt > minUpdatedAt
+    }
+  })
+  ->SortArray.stableSortBy((r1, r2) => {
+    if r1.updatedAt > r2.updatedAt {
+      1
+    } else if r1.updatedAt < r2.updatedAt {
+      -1
+    } else if r1.tag > r2.tag {
+      1
+    } else if r1.tag < r2.tag {
+      -1
+    } else {
+      0
+    }
+  })
+  ->Array.slice(~offset=0, ~len=limit)
 }
 
 let setRecipe = ({recipe}: Schema.recipeInput): Store.recipe => {
