@@ -66,11 +66,22 @@ function addTag(state, recipeId, tag) {
         };
 }
 
+function setRecipe(state, recipe) {
+  return {
+          recipes: Belt_MapString.set(state.recipes, recipe.id, recipe),
+          tags: state.tags
+        };
+}
+
 function reducer(state, action) {
-  if (action.TAG === /* AddRecipe */0) {
-    return addRecipe(state, action.id, action.title, action.ingredients, action.instructions);
-  } else {
-    return addTag(state, action.recipeId, action.tag);
+  switch (action.TAG | 0) {
+    case /* AddRecipe */0 :
+        return addRecipe(state, action.id, action.title, action.ingredients, action.instructions);
+    case /* AddTag */1 :
+        return addTag(state, action.recipeId, action.tag);
+    case /* SetRecipe */2 :
+        return setRecipe(state, action._0);
+    
   }
 }
 
@@ -96,6 +107,7 @@ exports.initialState = initialState;
 exports.addRecipe = addRecipe;
 exports.createOrUpdateTaggedRecipes = createOrUpdateTaggedRecipes;
 exports.addTag = addTag;
+exports.setRecipe = setRecipe;
 exports.reducer = reducer;
 exports.Reducer = Reducer;
 /* No side effect */

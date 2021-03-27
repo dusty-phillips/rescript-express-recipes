@@ -38,6 +38,7 @@ let initialState: state = {
 type action =
   | AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions})
   | AddTag({recipeId: id, tag: tag})
+  | SetRecipe(recipe)
 
 let addRecipe = (
   state: state,
@@ -107,11 +108,19 @@ let addTag = (state: state, recipeId: id, tag: tag) => {
   }
 }
 
+let setRecipe = (state: state, recipe: recipe) => {
+  {
+    recipes: state.recipes->Map.String.set(recipe.id, recipe),
+    tags: state.tags,
+  }
+}
+
 let reducer = (state: state, action: action) => {
   switch action {
   | AddRecipe({id, title, ingredients, instructions}) =>
     addRecipe(state, id, title, ingredients, instructions)
   | AddTag({recipeId, tag}) => addTag(state, recipeId, tag)
+  | SetRecipe(recipe) => setRecipe(state, recipe)
   }
 }
 
