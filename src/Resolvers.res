@@ -67,10 +67,14 @@ let setRecipe = ({recipe}: Schema.recipeInput): Store.recipe => {
 }
 
 let setTaggedRecipes = ({taggedRecipes}: Schema.taggedRecipesInput): Store.taggedRecipes => {
-  tag: taggedRecipes.tag,
-  recipes: taggedRecipes.recipes,
-  deleted: taggedRecipes.deleted,
-  updatedAt: Js.Date.now(),
+  let result: Store.taggedRecipes = {
+    tag: taggedRecipes.tag,
+    recipes: taggedRecipes.recipes,
+    deleted: taggedRecipes.deleted,
+    updatedAt: Js.Date.now(),
+  }
+  Store.Reducer.dispatch(SetTaggedRecipes(result))
+  result
 }
 
 let rootValue: Schema.rootValue = {

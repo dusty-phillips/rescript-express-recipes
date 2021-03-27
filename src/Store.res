@@ -39,6 +39,7 @@ type action =
   | AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions})
   | AddTag({recipeId: id, tag: tag})
   | SetRecipe(recipe)
+  | SetTaggedRecipes(taggedRecipes)
 
 let addRecipe = (
   state: state,
@@ -115,12 +116,20 @@ let setRecipe = (state: state, recipe: recipe) => {
   }
 }
 
+let setTaggedRecipes = (state: state, taggedRecipes: taggedRecipes) => {
+  {
+    recipes: state.recipes,
+    tags: state.tags->Map.String.set(taggedRecipes.tag, taggedRecipes),
+  }
+}
+
 let reducer = (state: state, action: action) => {
   switch action {
   | AddRecipe({id, title, ingredients, instructions}) =>
     addRecipe(state, id, title, ingredients, instructions)
   | AddTag({recipeId, tag}) => addTag(state, recipeId, tag)
   | SetRecipe(recipe) => setRecipe(state, recipe)
+  | SetTaggedRecipes(taggedRecipes) => setTaggedRecipes(state, taggedRecipes)
   }
 }
 

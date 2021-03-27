@@ -81,12 +81,21 @@ function setRecipe(param) {
 
 function setTaggedRecipes(param) {
   var taggedRecipes = param.taggedRecipes;
-  return {
-          tag: taggedRecipes.tag,
-          recipes: taggedRecipes.recipes,
-          updatedAt: Date.now(),
-          deleted: taggedRecipes.deleted
-        };
+  var result_tag = taggedRecipes.tag;
+  var result_recipes = taggedRecipes.recipes;
+  var result_updatedAt = Date.now();
+  var result_deleted = taggedRecipes.deleted;
+  var result = {
+    tag: result_tag,
+    recipes: result_recipes,
+    updatedAt: result_updatedAt,
+    deleted: result_deleted
+  };
+  Store.Reducer.dispatch({
+        TAG: /* SetTaggedRecipes */3,
+        _0: result
+      });
+  return result;
 }
 
 var rootValue = {

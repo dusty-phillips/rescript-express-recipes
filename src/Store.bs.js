@@ -73,6 +73,13 @@ function setRecipe(state, recipe) {
         };
 }
 
+function setTaggedRecipes(state, taggedRecipes) {
+  return {
+          recipes: state.recipes,
+          tags: Belt_MapString.set(state.tags, taggedRecipes.tag, taggedRecipes)
+        };
+}
+
 function reducer(state, action) {
   switch (action.TAG | 0) {
     case /* AddRecipe */0 :
@@ -81,6 +88,8 @@ function reducer(state, action) {
         return addTag(state, action.recipeId, action.tag);
     case /* SetRecipe */2 :
         return setRecipe(state, action._0);
+    case /* SetTaggedRecipes */3 :
+        return setTaggedRecipes(state, action._0);
     
   }
 }
@@ -108,6 +117,7 @@ exports.addRecipe = addRecipe;
 exports.createOrUpdateTaggedRecipes = createOrUpdateTaggedRecipes;
 exports.addTag = addTag;
 exports.setRecipe = setRecipe;
+exports.setTaggedRecipes = setTaggedRecipes;
 exports.reducer = reducer;
 exports.Reducer = Reducer;
 /* No side effect */
