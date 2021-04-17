@@ -2,9 +2,9 @@
   "name": "rescript-express-recipes",
   "version": "0.1.0",
   "scripts": {
-    "clean": "bsb -clean-world",
-    "build": "bsb -make-world",
-    "watch": "bsb -make-world -w",
+    "clean": "rescript clean",
+    "build": "rescript",
+    "watch": "rescript build -with-deps -w",
     "start": "node src/Index.bs.js"
   },
   "keywords": [
