@@ -69,6 +69,7 @@ let schema = buildSchema(`
     instructions: String!,
     tags: [String]!,
     deleted: Boolean!,
+    updatedAt: Float
 
   }
 
@@ -76,6 +77,7 @@ let schema = buildSchema(`
     tag: String!,
     recipes: [String]!,
     deleted: Boolean!,
+    updatedAt: Float
   }
 
   type Mutation {
