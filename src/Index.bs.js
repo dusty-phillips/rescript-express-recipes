@@ -159,12 +159,12 @@ Express.App.get(app, "/tags/:tag", Express.Middleware.from(function (_next, req,
           return res.json(jsonResponse);
         }));
 
-var server = Express.App.listen(app, 3000, undefined, (function (param) {
-        console.log("Example app listening at http://localhost:" + (3000).toString());
+var server = Express.App.listen(app, 3001, undefined, (function (param) {
+        console.log("Example app listening at http://localhost:" + (3001).toString());
         
       }), undefined);
 
-var port = 3000;
+var port = 3001;
 
 exports.app = app;
 exports.port = port;
