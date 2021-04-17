@@ -19,6 +19,11 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "rescript": "^9.1.1"
+    "@dusty-phillips/rescript-zora": "^2.0.0",
+    "c8": "^7.7.2",
+    "onchange": "^7.1.0",
+    "pta": "^1.0.0",
+    "rescript": "^9.1.4",
+    "zora": "^5.0.0"
   }
 }
