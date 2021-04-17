@@ -2,9 +2,9 @@
 'use strict';
 
 var Store = require("./Store.bs.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
-var Belt_MapString = require("bs-platform/lib/js/belt_MapString.js");
-var Belt_SortArray = require("bs-platform/lib/js/belt_SortArray.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_MapString = require("rescript/lib/js/belt_MapString.js");
+var Belt_SortArray = require("rescript/lib/js/belt_SortArray.js");
 
 function recipeRxDbFeed(param) {
   var minUpdatedAt = param.minUpdatedAt;
