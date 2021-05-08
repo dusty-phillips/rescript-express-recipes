@@ -5,7 +5,8 @@
     "clean": "rescript clean",
     "build": "rescript",
     "watch": "rescript build -with-deps -w",
-    "start": "node src/Index.bs.js"
+    "start": "node src/Index.bs.js",
+    "test": "onchange --initial '{tests,src}/*.js' -- pta 'tests/*.test.bs.js'"
   },
   "keywords": [
     "BuckleScript"
