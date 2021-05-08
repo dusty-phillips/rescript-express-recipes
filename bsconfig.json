@@ -9,7 +9,7 @@
     { "dir": "tests", "subdirs": true, "type": "dev" }
   ],
   "package-specs": {
-    "module": "commonjs",
+    "module": "es6",
     "in-source": true
   },
   "suffix": ".bs.js",
