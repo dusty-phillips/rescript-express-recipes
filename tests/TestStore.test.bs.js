@@ -40,6 +40,19 @@ Zora$1.test("Test recipes Store", (function (t) {
                 t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still be one recipe in the map");
                 return Zora.done(undefined);
               }));
+        t.test("AddTag action", (function (t) {
+                t.test("noop when recipe does not exist", (function (t) {
+                        var state = Store.reducer(Store.initialState, {
+                              TAG: /* AddTag */1,
+                              recipeId: "doesn't exist",
+                              tag: "add me"
+                            });
+                        t.equal(Belt_MapString.size(state.recipes), 0, "Should not have added a recipe");
+                        t.equal(Belt_MapString.size(state.tags), 0, "Should not have added a tag");
+                        return Zora.done(undefined);
+                      }));
+                return Zora.done(undefined);
+              }));
         
       }));
 

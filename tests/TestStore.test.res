@@ -41,4 +41,21 @@ zoraBlock("Test recipes Store", t => {
 
     done()
   })
+
+  t->test("AddTag action", t => {
+    t->test("noop when recipe does not exist", t => {
+      let state = Store.initialState
+      let action = Store.AddTag({
+        recipeId: "doesn't exist",
+        tag: "add me",
+      })
+
+      let state = Store.reducer(state, action)
+      t->equal(state.recipes->Map.String.size, 0, "Should not have added a recipe")
+      t->equal(state.tags->Map.String.size, 0, "Should not have added a tag")
+
+      done()
+    })
+    done()
+  })
 })
