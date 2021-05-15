@@ -56,6 +56,47 @@ zoraBlock("Test recipes Store", t => {
 
       done()
     })
+
+    t->test("creates tag when it does not exist", t => {
+      let state: Store.state = {
+        recipes: Map.String.empty->Map.String.set(
+          "abc",
+          {
+            Store.id: "abc",
+            title: "Bread",
+            ingredients: "Flour, Water",
+            instructions: "Mix and Bake",
+            tags: [],
+            updatedAt: 500.0,
+            deleted: false,
+          },
+        ),
+        tags: Map.String.empty,
+      }
+
+      let action = Store.AddTag({recipeId: "abc", tag: "Carbs"})
+      let state = Store.reducer(state, action)
+
+      t->equal(state.recipes->Map.String.size, 1, "Should still have one recipe")
+      t->equal(state.tags->Map.String.size, 1, "Should have one tag")
+
+      let breadOption = state.recipes->Map.String.get("abc")
+      t->Option.some(breadOption, "Bread should be defined")
+
+      let bread = breadOption->Belt.Option.getUnsafe
+      t->equal(bread.tags->Array.size, 1, "Bread should have one tag")
+      t->equal(bread.tags->Array.getUnsafe(0), "Carbs", "Bread tag should be carbs")
+
+      let tagsOption = state.tags->Map.String.get("Carbs")
+      t->Option.some(tagsOption, "Carbs tag should exist")
+
+      let tag = tagsOption->Belt.Option.getUnsafe
+      t->equal(tag.tag, "Carbs", "tag should have correct name")
+      t->equal(tag.recipes->Array.size, 1, "Tag should have one recipe")
+
+      done()
+    })
+
     done()
   })
 })

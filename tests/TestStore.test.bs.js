@@ -51,6 +51,37 @@ Zora$1.test("Test recipes Store", (function (t) {
                         t.equal(Belt_MapString.size(state.tags), 0, "Should not have added a tag");
                         return Zora.done(undefined);
                       }));
+                t.test("creates tag when it does not exist", (function (t) {
+                        var state_recipes = Belt_MapString.set(undefined, "abc", {
+                              id: "abc",
+                              title: "Bread",
+                              ingredients: "Flour, Water",
+                              instructions: "Mix and Bake",
+                              tags: [],
+                              updatedAt: 500.0,
+                              deleted: false
+                            });
+                        var state = {
+                          recipes: state_recipes,
+                          tags: undefined
+                        };
+                        var state$1 = Store.reducer(state, {
+                              TAG: /* AddTag */1,
+                              recipeId: "abc",
+                              tag: "Carbs"
+                            });
+                        t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still have one recipe");
+                        t.equal(Belt_MapString.size(state$1.tags), 1, "Should have one tag");
+                        var breadOption = Belt_MapString.get(state$1.recipes, "abc");
+                        Zora.$$Option.some(t, breadOption, "Bread should be defined");
+                        t.equal(breadOption.tags.length, 1, "Bread should have one tag");
+                        t.equal(breadOption.tags[0], "Carbs", "Bread tag should be carbs");
+                        var tagsOption = Belt_MapString.get(state$1.tags, "Carbs");
+                        Zora.$$Option.some(t, tagsOption, "Carbs tag should exist");
+                        t.equal(tagsOption.tag, "Carbs", "tag should have correct name");
+                        t.equal(tagsOption.recipes.length, 1, "Tag should have one recipe");
+                        return Zora.done(undefined);
+                      }));
                 return Zora.done(undefined);
               }));
         
