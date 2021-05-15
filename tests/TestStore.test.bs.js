@@ -81,6 +81,44 @@ function $$default(t) {
                   t.equal(tagsOption.recipes.length, 1, "Tag should have one recipe");
                   return Zora.done(undefined);
                 }));
+          t.test("appends tag when it does exist", (function (t) {
+                  var state_recipes = Belt_MapString.set(undefined, "abc", {
+                        id: "abc",
+                        title: "Bread",
+                        ingredients: "Flour, Water",
+                        instructions: "Mix and Bake",
+                        tags: ["Baking"],
+                        updatedAt: 500.0,
+                        deleted: false
+                      });
+                  var state_tags = Belt_MapString.set(undefined, "baking", {
+                        tag: "baking",
+                        recipes: ["abc"],
+                        updatedAt: 500.0,
+                        deleted: false
+                      });
+                  var state = {
+                    recipes: state_recipes,
+                    tags: state_tags
+                  };
+                  var state$1 = Store.reducer(state, {
+                        TAG: /* AddTag */1,
+                        recipeId: "abc",
+                        tag: "Carbs"
+                      });
+                  t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still have one recipe");
+                  t.equal(Belt_MapString.size(state$1.tags), 2, "Should have two tags");
+                  var breadOption = Belt_MapString.get(state$1.recipes, "abc");
+                  Zora.$$Option.some(t, breadOption, "Bread should be defined");
+                  t.equal(breadOption.tags.length, 2, "Bread should have two tags");
+                  t.equal(breadOption.tags[0], "Baking", "First bread tag should be Baking");
+                  t.equal(breadOption.tags[1], "Carbs", "Second bread tag should be carbs");
+                  var tagsOption = Belt_MapString.get(state$1.tags, "Carbs");
+                  Zora.$$Option.some(t, tagsOption, "Carbs tag should exist");
+                  t.equal(tagsOption.tag, "Carbs", "tag should have correct name");
+                  t.equal(tagsOption.recipes.length, 1, "Tag should have one recipe");
+                  return Zora.done(undefined);
+                }));
           return Zora.done(undefined);
         }));
   
