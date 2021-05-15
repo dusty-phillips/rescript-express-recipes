@@ -73,13 +73,17 @@ Zora$1.test("Test recipes Store", (function (t) {
                         t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still have one recipe");
                         t.equal(Belt_MapString.size(state$1.tags), 1, "Should have one tag");
                         var breadOption = Belt_MapString.get(state$1.recipes, "abc");
-                        Zora.$$Option.some(t, breadOption, "Bread should be defined");
-                        t.equal(breadOption.tags.length, 1, "Bread should have one tag");
-                        t.equal(breadOption.tags[0], "Carbs", "Bread tag should be carbs");
+                        Zora.optionSome(t, breadOption, (function (t, bread) {
+                                t.equal(bread.tags.length, 1, "Bread should have one tag");
+                                t.equal(bread.tags[0], "Carbs", "Bread tag should be carbs");
+                                
+                              }));
                         var tagsOption = Belt_MapString.get(state$1.tags, "Carbs");
-                        Zora.$$Option.some(t, tagsOption, "Carbs tag should exist");
-                        t.equal(tagsOption.tag, "Carbs", "tag should have correct name");
-                        t.equal(tagsOption.recipes.length, 1, "Tag should have one recipe");
+                        Zora.optionSome(t, tagsOption, (function (t, tag) {
+                                t.equal(tag.tag, "Carbs", "tag should have correct name");
+                                t.equal(tag.recipes.length, 1, "Tag should have one recipe");
+                                
+                              }));
                         return Zora.done(undefined);
                       }));
                 return Zora.done(undefined);

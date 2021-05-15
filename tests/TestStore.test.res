@@ -81,18 +81,16 @@ zoraBlock("Test recipes Store", t => {
       t->equal(state.tags->Map.String.size, 1, "Should have one tag")
 
       let breadOption = state.recipes->Map.String.get("abc")
-      t->Option.some(breadOption, "Bread should be defined")
-
-      let bread = breadOption->Belt.Option.getUnsafe
-      t->equal(bread.tags->Array.size, 1, "Bread should have one tag")
-      t->equal(bread.tags->Array.getUnsafe(0), "Carbs", "Bread tag should be carbs")
+      t->optionSome(breadOption, (t, bread) => {
+        t->equal(bread.tags->Array.size, 1, "Bread should have one tag")
+        t->equal(bread.tags->Array.getUnsafe(0), "Carbs", "Bread tag should be carbs")
+      })
 
       let tagsOption = state.tags->Map.String.get("Carbs")
-      t->Option.some(tagsOption, "Carbs tag should exist")
-
-      let tag = tagsOption->Belt.Option.getUnsafe
-      t->equal(tag.tag, "Carbs", "tag should have correct name")
-      t->equal(tag.recipes->Array.size, 1, "Tag should have one recipe")
+      t->optionSome(tagsOption, (t, tag) => {
+        t->equal(tag.tag, "Carbs", "tag should have correct name")
+        t->equal(tag.recipes->Array.size, 1, "Tag should have one recipe")
+      })
 
       done()
     })
