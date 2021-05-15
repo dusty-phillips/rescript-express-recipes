@@ -81,14 +81,14 @@ let default: zoraTestBlock = t => {
       t->equal(state.tags->Map.String.size, 1, "Should have one tag")
 
       let breadOption = state.recipes->Map.String.get("abc")
-      t->Option.some(breadOption, "Bread should be defined")
+      t->Zora.Option.some(breadOption, "Bread should be defined")
 
       let bread = breadOption->Belt.Option.getUnsafe
       t->equal(bread.tags->Array.size, 1, "Bread should have one tag")
       t->equal(bread.tags->Array.getUnsafe(0), "Carbs", "Bread tag should be carbs")
 
       let tagsOption = state.tags->Map.String.get("Carbs")
-      t->Option.some(tagsOption, "Carbs tag should exist")
+      t->Zora.Option.some(tagsOption, "Carbs tag should exist")
 
       let tag = tagsOption->Belt.Option.getUnsafe
       t->equal(tag.tag, "Carbs", "tag should have correct name")
