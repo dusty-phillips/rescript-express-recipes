@@ -2,14 +2,42 @@
 
 import * as Zora from "@dusty-phillips/rescript-zora/src/Zora.bs.js";
 import * as Zora$1 from "zora";
+import * as Store from "../src/Store.bs.js";
+import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 
-Zora$1.test("testing_works", (function (t) {
-        t.test("testing works", (function (t) {
-                t.ok(true, "I told you it works");
+Zora$1.test("Test recipes Store", (function (t) {
+        t.test("Adds a recipe to empty state", (function (t) {
+                var newState = Store.reducer(Store.initialState, {
+                      TAG: /* AddRecipe */0,
+                      id: "abc",
+                      title: "Bread",
+                      ingredients: "Flour, Water",
+                      instructions: "Mix and Bake"
+                    });
+                t.equal(Belt_MapString.size(newState.recipes), 1, "Should be one recipe in the map");
+                t.ok(Belt_MapString.has(newState.recipes, "abc"), "The one recipe should have id 'abc'");
+                var recipe = Belt_MapString.getExn(newState.recipes, "abc");
+                t.equal(recipe.title, "Bread", "The titles should match");
+                t.equal(Belt_MapString.size(Store.initialState.tags), 0, "Should not add any tags");
                 return Zora.done(undefined);
               }));
-        t.test("testing still works", (function (t) {
-                t.ok(true, "I told you it works");
+        t.test("setRecipe does not add two recipes", (function (t) {
+                var action = {
+                  TAG: /* SetRecipe */2,
+                  _0: {
+                    id: "abc",
+                    title: "Bread",
+                    ingredients: "Flour, Water",
+                    instructions: "Mix and Bake",
+                    tags: [],
+                    updatedAt: 500.0,
+                    deleted: false
+                  }
+                };
+                var state = Store.reducer(Store.initialState, action);
+                t.equal(Belt_MapString.size(state.recipes), 1, "Should be one recipe in the map");
+                var state$1 = Store.reducer(state, action);
+                t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still be one recipe in the map");
                 return Zora.done(undefined);
               }));
         
