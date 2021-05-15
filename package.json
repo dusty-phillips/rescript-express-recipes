@@ -7,7 +7,9 @@
     "build": "rescript",
     "watch": "rescript build -with-deps -w",
     "start": "node src/Index.bs.js",
-    "test": "onchange --initial '{tests,src}/*.js' -- pta 'tests/*.test.bs.js'"
+    "test": "onchange --initial '{tests,src}/*.js' -- pta 'tests/*.test.bs.js'",
+    "test:coverage": "c8 --all pta 'tests/*.test.bs.js'",
+    "test:htmlcoverage": "c8 ---reporter html -all pta 'tests/*.test.bs.js'"
   },
   "keywords": [
     "BuckleScript"
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@dusty-phillips/rescript-zora": "^0.1.1",
+    "c8": "^7.7.2",
     "onchange": "^7.1.0",
     "pta": "^0.2.3",
     "rescript": "^9.1.1",
