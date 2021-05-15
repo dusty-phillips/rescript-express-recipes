@@ -86,6 +86,48 @@ Zora$1.test("Test recipes Store", (function (t) {
                               }));
                         return Zora.done(undefined);
                       }));
+                t.test("appends tag when it does exist", (function (t) {
+                        var state_recipes = Belt_MapString.set(undefined, "abc", {
+                              id: "abc",
+                              title: "Bread",
+                              ingredients: "Flour, Water",
+                              instructions: "Mix and Bake",
+                              tags: ["Baking"],
+                              updatedAt: 500.0,
+                              deleted: false
+                            });
+                        var state_tags = Belt_MapString.set(undefined, "baking", {
+                              tag: "baking",
+                              recipes: ["abc"],
+                              updatedAt: 500.0,
+                              deleted: false
+                            });
+                        var state = {
+                          recipes: state_recipes,
+                          tags: state_tags
+                        };
+                        var state$1 = Store.reducer(state, {
+                              TAG: /* AddTag */1,
+                              recipeId: "abc",
+                              tag: "Carbs"
+                            });
+                        t.equal(Belt_MapString.size(state$1.recipes), 1, "Should still have one recipe");
+                        t.equal(Belt_MapString.size(state$1.tags), 2, "Should have two tags");
+                        var breadOption = Belt_MapString.get(state$1.recipes, "abc");
+                        Zora.optionSome(t, breadOption, (function (t, bread) {
+                                t.equal(bread.tags.length, 2, "Bread should have two tag");
+                                t.equal(bread.tags[0], "Baking", "First bread tag should be Baking");
+                                t.equal(bread.tags[1], "Carbs", "Second bread tag should be carbs");
+                                
+                              }));
+                        var tagsOption = Belt_MapString.get(state$1.tags, "Carbs");
+                        Zora.optionSome(t, tagsOption, (function (t, tag) {
+                                t.equal(tag.tag, "Carbs", "tag should have correct name");
+                                t.equal(tag.recipes.length, 1, "Tag should have one recipe");
+                                
+                              }));
+                        return Zora.done(undefined);
+                      }));
                 return Zora.done(undefined);
               }));
         

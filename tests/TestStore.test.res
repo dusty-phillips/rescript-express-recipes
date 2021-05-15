@@ -95,6 +95,48 @@ zoraBlock("Test recipes Store", t => {
       done()
     })
 
+    t->test("appends tag when it does exist", t => {
+      let state: Store.state = {
+        recipes: Map.String.empty->Map.String.set(
+          "abc",
+          {
+            Store.id: "abc",
+            title: "Bread",
+            ingredients: "Flour, Water",
+            instructions: "Mix and Bake",
+            tags: ["Baking"],
+            updatedAt: 500.0,
+            deleted: false,
+          },
+        ),
+        tags: Map.String.empty->Map.String.set(
+          "baking",
+          {Store.tag: "baking", recipes: ["abc"], updatedAt: 500.0, deleted: false},
+        ),
+      }
+
+      let action = Store.AddTag({recipeId: "abc", tag: "Carbs"})
+      let state = Store.reducer(state, action)
+
+      t->equal(state.recipes->Map.String.size, 1, "Should still have one recipe")
+      t->equal(state.tags->Map.String.size, 2, "Should have two tags")
+
+      let breadOption = state.recipes->Map.String.get("abc")
+      t->optionSome(breadOption, (t, bread) => {
+        t->equal(bread.tags->Array.size, 2, "Bread should have two tag")
+        t->equal(bread.tags->Array.getUnsafe(0), "Baking", "First bread tag should be Baking")
+        t->equal(bread.tags->Array.getUnsafe(1), "Carbs", "Second bread tag should be carbs")
+      })
+
+      let tagsOption = state.tags->Map.String.get("Carbs")
+      t->optionSome(tagsOption, (t, tag) => {
+        t->equal(tag.tag, "Carbs", "tag should have correct name")
+        t->equal(tag.recipes->Array.size, 1, "Tag should have one recipe")
+      })
+
+      done()
+    })
+
     done()
   })
 })
