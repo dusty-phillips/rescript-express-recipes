@@ -23,10 +23,15 @@ Express.App.useOnPath(app, "/graphql", ExpressGraphql.graphqlHTTP({
           rootValue: Resolvers.rootValue
         }));
 
+function hello_world(param) {
+  var result = {};
+  result["Hello"] = "World";
+  return result;
+}
+
 Express.App.get(app, "/", Express.Middleware.from(function (param, param$1, res) {
-          var result = {};
-          result["Hello"] = "World";
-          return Express.$$Response.status(res, /* Ok */0).json(result);
+          var json = hello_world(undefined);
+          return Express.$$Response.status(res, /* Ok */0).json(json);
         }));
 
 Express.App.post(app, "/addRecipe", Express.Middleware.from(function (_next, req, res) {
@@ -168,6 +173,7 @@ var port = 3001;
 export {
   app ,
   port ,
+  hello_world ,
   server ,
   
 }

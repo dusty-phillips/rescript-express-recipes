@@ -15,13 +15,17 @@ App.useOnPath(
   }),
 )
 
+let hello_world = () => {
+  let result = Js.Dict.empty()
+  result->Js.Dict.set("Hello", "World"->Js.Json.string)
+  result->Js.Json.object_
+}
+
 App.get(
   app,
   ~path="/",
   Middleware.from((_, _, res) => {
-    let result = Js.Dict.empty()
-    result->Js.Dict.set("Hello", "World"->Js.Json.string)
-    let json = result->Js.Json.object_
+    let json = hello_world()
     res->Response.status(Response.StatusCode.Ok)->Response.sendJson(json)
   }),
 )
