@@ -77,4 +77,13 @@ zoraBlock("Test endpoints", t => {
   })
 
   Store.Reducer.dangerousResetState()
+
+  t->block("addRecipe missing attribute", t => {
+    let body = Some(Js.Json.parseExn(`{}`))
+    let result = body->Controller.addRecipe
+    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
+    let expected = `{"error":"missing attribute"}`
+    t->equal(json, expected, "There should be missing attributes")
+    Js.log(json)
+  })
 })

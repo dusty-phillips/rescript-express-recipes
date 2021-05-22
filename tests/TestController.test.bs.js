@@ -35,7 +35,16 @@ Zora.test("Test endpoints", (function (t) {
                 t.equal(json$3, expected$2, "tag should now have recipes");
                 
               }));
-        return Store.Reducer.dangerousResetState(undefined);
+        Store.Reducer.dangerousResetState(undefined);
+        t.test("addRecipe missing attribute", (function (t) {
+                var body = Caml_option.some(JSON.parse("{}"));
+                var result = Controller.addRecipe(body);
+                var json = JSON.stringify(result);
+                t.equal(json, "{\"error\":\"missing attribute\"}", "There should be missing attributes");
+                console.log(json);
+                
+              }));
+        
       }));
 
 export {
