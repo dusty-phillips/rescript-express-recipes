@@ -136,6 +136,7 @@ let reducer = (state: state, action: action) => {
 module type UseReducer = {
   let getState: unit => state
   let dispatch: action => unit
+  let dangerousResetState: unit => unit
 }
 
 module Reducer: UseReducer = {
@@ -143,5 +144,8 @@ module Reducer: UseReducer = {
   let getState = () => currentState.contents
   let dispatch = (action: action) => {
     currentState.contents = reducer(currentState.contents, action)
+  }
+  let dangerousResetState = () => {
+    currentState.contents = initialState
   }
 }

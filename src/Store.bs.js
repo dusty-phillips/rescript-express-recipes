@@ -106,9 +106,15 @@ function dispatch(action) {
   
 }
 
+function dangerousResetState(param) {
+  currentState.contents = initialState;
+  
+}
+
 var Reducer = {
   getState: getState,
-  dispatch: dispatch
+  dispatch: dispatch,
+  dangerousResetState: dangerousResetState
 };
 
 export {
