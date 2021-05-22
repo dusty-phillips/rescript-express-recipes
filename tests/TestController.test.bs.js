@@ -44,6 +44,13 @@ Zora.test("Test endpoints", (function (t) {
                 console.log(json);
                 
               }));
+        t.test("can't add tag to nonexistent recipe", (function (t) {
+                var body = Caml_option.some(JSON.parse("\n        {\n          \"recipeId\": \"Not a Recipe\",\n          \"tag\": \"Carbs\"\n        }\n        "));
+                var result = Controller.addTagToRecipe(body);
+                var json = JSON.stringify(Js_json.decodeObject(result));
+                t.equal(json, "{\"error\":\"invalid request\"}", "addTagToRecipe should return success");
+                
+              }));
         
       }));
 

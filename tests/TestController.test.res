@@ -86,4 +86,26 @@ zoraBlock("Test endpoints", t => {
     t->equal(json, expected, "There should be missing attributes")
     Js.log(json)
   })
+
+  t->block("can't add tag to nonexistent recipe", t => {
+    let body = Some(
+      Js.Json.parseExn(`
+        {
+          "recipeId": "Not a Recipe",
+          "tag": "Carbs"
+        }
+        `),
+    )
+
+    let result = body->Controller.addTagToRecipe
+
+    let json =
+      result
+      ->Js.Json.decodeObject
+      ->Belt.Option.getUnsafe
+      ->Js.Json.stringifyAny
+      ->Belt.Option.getUnsafe
+    let expected = `{"error":"invalid request"}`
+    t->equal(json, expected, "addTagToRecipe should return success")
+  })
 })
