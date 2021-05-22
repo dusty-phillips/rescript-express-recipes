@@ -21,7 +21,7 @@ Zora.test("Test endpoints", (function (t) {
                 t.equal(json, expected, "get recipe should match input");
                 var body$1 = Caml_option.some(JSON.parse("\n        {\n          \"recipeId\": \"" + id + "\",\n          \"tag\": \"Carbs\"\n        }\n        "));
                 var result$2 = Controller.addTagToRecipe(body$1);
-                var json$1 = JSON.stringify(Js_json.decodeObject(result$2));
+                var json$1 = JSON.stringify(result$2);
                 t.equal(json$1, "{\"success\":true}", "addTagToRecipe should return success");
                 var result$3 = Controller.getRecipe(params);
                 var json$2 = JSON.stringify(result$3);
@@ -30,7 +30,7 @@ Zora.test("Test endpoints", (function (t) {
                 var params$1 = {};
                 params$1["tag"] = "Carbs";
                 var result$4 = Controller.getTag(params$1);
-                var json$3 = JSON.stringify(Js_json.decodeObject(result$4));
+                var json$3 = JSON.stringify(result$4);
                 var expected$2 = "{\"recipes\":[{\"id\":\"" + id + "\",\"title\":\"Bread\"}]}";
                 t.equal(json$3, expected$2, "tag should now have recipes");
                 
@@ -47,8 +47,16 @@ Zora.test("Test endpoints", (function (t) {
         t.test("can't add tag to nonexistent recipe", (function (t) {
                 var body = Caml_option.some(JSON.parse("\n        {\n          \"recipeId\": \"Not a Recipe\",\n          \"tag\": \"Carbs\"\n        }\n        "));
                 var result = Controller.addTagToRecipe(body);
-                var json = JSON.stringify(Js_json.decodeObject(result));
+                var json = JSON.stringify(result);
                 t.equal(json, "{\"error\":\"invalid request\"}", "addTagToRecipe should return success");
+                
+              }));
+        t.test("Can't get recipe that doesn't exist", (function (t) {
+                var params = {};
+                params["id"] = "Not a Recipe";
+                var result = Controller.getRecipe(params);
+                var json = JSON.stringify(result);
+                t.equal(json, "{\"error\":\"unable to find that recipe\"}", "get recipe should match input");
                 
               }));
         

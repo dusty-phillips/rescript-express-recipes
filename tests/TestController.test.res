@@ -46,12 +46,7 @@ zoraBlock("Test endpoints", t => {
 
     let result = body->Controller.addTagToRecipe
 
-    let json =
-      result
-      ->Js.Json.decodeObject
-      ->Belt.Option.getUnsafe
-      ->Js.Json.stringifyAny
-      ->Belt.Option.getUnsafe
+    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
     let expected = `{"success":true}`
     t->equal(json, expected, "addTagToRecipe should return success")
 
@@ -66,12 +61,7 @@ zoraBlock("Test endpoints", t => {
 
     let result = params->Controller.getTag
 
-    let json =
-      result
-      ->Js.Json.decodeObject
-      ->Belt.Option.getUnsafe
-      ->Js.Json.stringifyAny
-      ->Belt.Option.getUnsafe
+    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
     let expected = `{"recipes":[{"id":"${id}","title":"Bread"}]}`
     t->equal(json, expected, "tag should now have recipes")
   })
@@ -96,16 +86,18 @@ zoraBlock("Test endpoints", t => {
         }
         `),
     )
-
     let result = body->Controller.addTagToRecipe
-
-    let json =
-      result
-      ->Js.Json.decodeObject
-      ->Belt.Option.getUnsafe
-      ->Js.Json.stringifyAny
-      ->Belt.Option.getUnsafe
+    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
     let expected = `{"error":"invalid request"}`
     t->equal(json, expected, "addTagToRecipe should return success")
+  })
+
+  t->block("Can't get recipe that doesn't exist", t => {
+    let params = Js.Dict.empty()
+    params->Js.Dict.set("id", "Not a Recipe"->Js.Json.string)
+    let result = params->Controller.getRecipe
+    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
+    let expected = `{"error":"unable to find that recipe"}`
+    t->equal(json, expected, "get recipe should match input")
   })
 })
