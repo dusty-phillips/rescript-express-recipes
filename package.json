@@ -9,7 +9,7 @@
     "start": "node src/Index.bs.js",
     "test": "onchange --initial '{tests,src}/*.js' -- pta 'tests/*.test.bs.js'",
     "test:coverage": "c8 --all pta 'tests/*.test.bs.js'",
-    "test:htmlcoverage": "c8 ---reporter html -all pta 'tests/*.test.bs.js'"
+    "test:htmlcoverage": "c8 ---reporter html --all pta 'tests/*.test.bs.js'"
   },
   "keywords": [
     "BuckleScript"
