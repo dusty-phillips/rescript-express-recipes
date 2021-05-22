@@ -19,6 +19,20 @@ Zora.test("Test endpoints", (function (t) {
                 var json = JSON.stringify(result$1);
                 var expected = "{\"id\":\"" + id + "\",\"title\":\"Bread\",\"ingredients\":\"Flour and Water\",\"instructions\":\"Mix and Bake\",\"tags\":[]}";
                 t.equal(json, expected, "get recipe should match input");
+                var body$1 = Caml_option.some(JSON.parse("\n        {\n          \"recipeId\": \"" + id + "\",\n          \"tag\": \"Carbs\"\n        }\n        "));
+                var result$2 = Controller.addTagToRecipe(body$1);
+                var json$1 = JSON.stringify(Js_json.decodeObject(result$2));
+                t.equal(json$1, "{\"success\":true}", "addTagToRecipe should return success");
+                var result$3 = Controller.getRecipe(params);
+                var json$2 = JSON.stringify(result$3);
+                var expected$1 = "{\"id\":\"" + id + "\",\"title\":\"Bread\",\"ingredients\":\"Flour and Water\",\"instructions\":\"Mix and Bake\",\"tags\":[\"Carbs\"]}";
+                t.equal(json$2, expected$1, "get recipe should match input");
+                var params$1 = {};
+                params$1["tag"] = "Carbs";
+                var result$4 = Controller.getTag(params$1);
+                var json$3 = JSON.stringify(Js_json.decodeObject(result$4));
+                var expected$2 = "{\"recipes\":[{\"id\":\"" + id + "\",\"title\":\"Bread\"}]}";
+                t.equal(json$3, expected$2, "tag should now have recipes");
                 
               }));
         return Store.Reducer.dangerousResetState(undefined);
