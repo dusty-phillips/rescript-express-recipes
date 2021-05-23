@@ -12,7 +12,7 @@
     "module": "es6",
     "in-source": true
   },
-  "suffix": ".bs.js",
+  "suffix": ".mjs",
   "bs-dependencies": [
     "bs-express",
     "@dusty-phillips/rescript-zora",

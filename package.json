@@ -6,10 +6,10 @@
     "clean": "rescript clean",
     "build": "rescript",
     "watch": "rescript build -with-deps -w",
-    "start": "node src/Index.bs.js",
-    "test": "onchange --initial '{tests,src}/*.js' -- pta 'tests/*.test.bs.js'",
-    "test:coverage": "c8 --all pta 'tests/*.test.bs.js'",
-    "test:htmlcoverage": "c8 ---reporter html --all pta 'tests/*.test.bs.js'"
+    "start": "node src/Index.mjs",
+    "test": "onchange --initial '{tests,src}/*.mjs' -- pta 'tests/*.test.mjs'",
+    "test:coverage": "c8 --all pta 'tests/*.test.mjs'",
+    "test:htmlcoverage": "c8 ---reporter html --all pta 'tests/*.test.mjs'"
   },
   "keywords": [
     "BuckleScript"
