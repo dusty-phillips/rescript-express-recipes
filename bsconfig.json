@@ -13,5 +13,9 @@
     "in-source": true
   },
   "suffix": ".bs.js",
-  "bs-dependencies": ["bs-express", "@dusty-phillips/rescript-zora"]
+  "bs-dependencies": [
+    "bs-express",
+    "@dusty-phillips/rescript-zora",
+    "rescript-jzon"
+  ]
 }
