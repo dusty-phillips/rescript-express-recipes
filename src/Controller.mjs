@@ -2,17 +2,34 @@
 
 import * as Jzon from "rescript-jzon/src/Jzon.mjs";
 import * as Uuid from "uuid";
+import * as Curry from "rescript/lib/es6/curry.js";
 import * as Store from "./Store.mjs";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Js_json from "rescript/lib/es6/js_json.js";
 import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
+import * as Belt_Result from "rescript/lib/es6/belt_Result.js";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 
 function helloWorld(param) {
   var result = {};
   result["Hello"] = "World";
   return result;
+}
+
+function jsonResult(o) {
+  return Belt_Option.mapWithDefault(o, {
+              TAG: /* Error */1,
+              _0: {
+                NAME: "SyntaxError",
+                VAL: "Invalid JSON"
+              }
+            }, (function (s) {
+                return {
+                        TAG: /* Ok */0,
+                        _0: s
+                      };
+              }));
 }
 
 var addRecipeInputCodec = Jzon.object3((function (param) {
@@ -32,45 +49,23 @@ var addRecipeInputCodec = Jzon.object3((function (param) {
               };
       }), Jzon.field("title", Jzon.string), Jzon.field("ingredients", Jzon.string), Jzon.field("instructions", Jzon.string));
 
-function addRecipe(body) {
-  var jsonFields = Belt_Option.map(Belt_Option.flatMap(body, Js_json.decodeObject), (function (jsonBody) {
-          return [
-                  Belt_Option.flatMap(Js_dict.get(jsonBody, "title"), Js_json.decodeString),
-                  Belt_Option.flatMap(Js_dict.get(jsonBody, "ingredients"), Js_json.decodeString),
-                  Belt_Option.flatMap(Js_dict.get(jsonBody, "instructions"), Js_json.decodeString)
-                ];
+function addRecipe(bodyOption) {
+  var jsonBodyOption = Belt_Result.flatMap(jsonResult(bodyOption), (function (j) {
+          return Curry._1(Jzon.decode(addRecipeInputCodec), j);
         }));
   var jsonResponse = {};
-  var exit = 0;
-  if (jsonFields !== undefined) {
-    var title = jsonFields[0];
-    if (title !== undefined) {
-      var ingredients = jsonFields[1];
-      if (ingredients !== undefined) {
-        var instructions = jsonFields[2];
-        if (instructions !== undefined) {
-          var id = Uuid.v4();
-          Store.Reducer.dispatch({
-                TAG: /* AddRecipe */0,
-                id: id,
-                title: title,
-                ingredients: ingredients,
-                instructions: instructions
-              });
-          jsonResponse["id"] = id;
-        } else {
-          exit = 1;
-        }
-      } else {
-        exit = 1;
-      }
-    } else {
-      exit = 1;
-    }
+  if (jsonBodyOption.TAG === /* Ok */0) {
+    var match = jsonBodyOption._0;
+    var id = Uuid.v4();
+    Store.Reducer.dispatch({
+          TAG: /* AddRecipe */0,
+          id: id,
+          title: match.title,
+          ingredients: match.ingredients,
+          instructions: match.instructions
+        });
+    jsonResponse["id"] = id;
   } else {
-    exit = 1;
-  }
-  if (exit === 1) {
     jsonResponse["error"] = "missing attribute";
   }
   return jsonResponse;
@@ -157,6 +152,7 @@ function getTag(params) {
 
 export {
   helloWorld ,
+  jsonResult ,
   addRecipeInputCodec ,
   addRecipe ,
   addTagToRecipe ,
