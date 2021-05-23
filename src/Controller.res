@@ -4,6 +4,25 @@ let helloWorld = () => {
   result->Js.Json.object_
 }
 
+type addRecipeInput = {
+  title: string,
+  ingredients: string,
+  instructions: string,
+}
+
+let addRecipeInputCodec = Jzon.object3(
+  ({title, ingredients, instructions}) => (title, ingredients, instructions),
+  ((title, ingredients, instructions)) =>
+    {
+      title: title,
+      ingredients: ingredients,
+      instructions: instructions,
+    }->Ok,
+  Jzon.field("title", Jzon.string),
+  Jzon.field("ingredients", Jzon.string),
+  Jzon.field("instructions", Jzon.string),
+)
+
 let addRecipe = body => {
   let jsonFields =
     body
