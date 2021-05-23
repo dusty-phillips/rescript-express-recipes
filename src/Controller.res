@@ -4,6 +4,8 @@ let helloWorld = () => {
   result->Js.Json.object_
 }
 
+let jsonResult = o => o->Belt.Option.mapWithDefault(Error(#SyntaxError("Invalid JSON")), s => Ok(s))
+
 type addRecipeInput = {
   title: string,
   ingredients: string,
@@ -23,23 +25,16 @@ let addRecipeInputCodec = Jzon.object3(
   Jzon.field("instructions", Jzon.string),
 )
 
-let addRecipe = body => {
-  let jsonFields =
-    body
-    ->Belt.Option.flatMap(Js.Json.decodeObject)
-    ->Belt.Option.map(jsonBody => (
-      jsonBody->Js.Dict.get("title")->Belt.Option.flatMap(Js.Json.decodeString),
-      jsonBody->Js.Dict.get("ingredients")->Belt.Option.flatMap(Js.Json.decodeString),
-      jsonBody->Js.Dict.get("instructions")->Belt.Option.flatMap(Js.Json.decodeString),
-    ))
+let addRecipe = bodyOption => {
+  let jsonBodyOption =
+    bodyOption->jsonResult->Belt.Result.flatMap(j => addRecipeInputCodec->Jzon.decode(j))
 
   let jsonResponse = Js.Dict.empty()
 
-  switch jsonFields {
-  | Some(Some(title), Some(ingredients), Some(instructions)) => {
-      open Store.Reducer
+  switch jsonBodyOption {
+  | Ok({title, instructions, ingredients}) => {
       let id = Store.uuid()
-      dispatch(
+      Store.Reducer.dispatch(
         AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions}),
       )
       jsonResponse->Js.Dict.set("id", id->Js.Json.string)
