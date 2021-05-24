@@ -32,6 +32,17 @@ function jsonResult(o) {
               }));
 }
 
+var errorResultCodec = Jzon.object1((function (param) {
+        return param.error;
+      }), (function (error) {
+        return {
+                TAG: /* Ok */0,
+                _0: {
+                  error: error
+                }
+              };
+      }), Jzon.field("error", Jzon.string));
+
 var addRecipeInputCodec = Jzon.object3((function (param) {
         return [
                 param.title,
@@ -49,26 +60,38 @@ var addRecipeInputCodec = Jzon.object3((function (param) {
               };
       }), Jzon.field("title", Jzon.string), Jzon.field("ingredients", Jzon.string), Jzon.field("instructions", Jzon.string));
 
+var addRecipeSuccessCodec = Jzon.object1((function (param) {
+        return param.id;
+      }), (function (id) {
+        return {
+                TAG: /* Ok */0,
+                _0: {
+                  id: id
+                }
+              };
+      }), Jzon.field("id", Jzon.string));
+
 function addRecipe(bodyOption) {
   var jsonBodyOption = Belt_Result.flatMap(jsonResult(bodyOption), (function (j) {
           return Curry._1(Jzon.decode(addRecipeInputCodec), j);
         }));
-  var jsonResponse = {};
-  if (jsonBodyOption.TAG === /* Ok */0) {
-    var match = jsonBodyOption._0;
-    var id = Uuid.v4();
-    Store.Reducer.dispatch({
-          TAG: /* AddRecipe */0,
-          id: id,
-          title: match.title,
-          ingredients: match.ingredients,
-          instructions: match.instructions
-        });
-    jsonResponse["id"] = id;
-  } else {
-    jsonResponse["error"] = "missing attribute";
+  if (jsonBodyOption.TAG !== /* Ok */0) {
+    return Curry._1(Jzon.encode(errorResultCodec), {
+                error: Jzon.DecodingError.toString(jsonBodyOption._0)
+              });
   }
-  return jsonResponse;
+  var match = jsonBodyOption._0;
+  var id = Uuid.v4();
+  Store.Reducer.dispatch({
+        TAG: /* AddRecipe */0,
+        id: id,
+        title: match.title,
+        ingredients: match.ingredients,
+        instructions: match.instructions
+      });
+  return Curry._1(Jzon.encode(addRecipeSuccessCodec), {
+              id: id
+            });
 }
 
 function addTagToRecipe(body) {
@@ -153,11 +176,13 @@ function getTag(params) {
 export {
   helloWorld ,
   jsonResult ,
+  errorResultCodec ,
   addRecipeInputCodec ,
+  addRecipeSuccessCodec ,
   addRecipe ,
   addTagToRecipe ,
   getRecipe ,
   getTag ,
   
 }
-/* addRecipeInputCodec Not a pure module */
+/* errorResultCodec Not a pure module */

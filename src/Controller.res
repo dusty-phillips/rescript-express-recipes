@@ -6,6 +6,14 @@ let helloWorld = () => {
 
 let jsonResult = o => o->Belt.Option.mapWithDefault(Error(#SyntaxError("Invalid JSON")), s => Ok(s))
 
+type errorResult = {error: string}
+
+let errorResultCodec = Jzon.object1(
+  ({error}) => error,
+  error => {error: error}->Ok,
+  Jzon.field("error", Jzon.string),
+)
+
 type addRecipeInput = {
   title: string,
   ingredients: string,
@@ -25,11 +33,17 @@ let addRecipeInputCodec = Jzon.object3(
   Jzon.field("instructions", Jzon.string),
 )
 
+type addRecipeSuccess = {id: string}
+
+let addRecipeSuccessCodec = Jzon.object1(
+  ({id}) => id,
+  id => {id: id}->Ok,
+  Jzon.field("id", Jzon.string),
+)
+
 let addRecipe = bodyOption => {
   let jsonBodyOption =
     bodyOption->jsonResult->Belt.Result.flatMap(j => addRecipeInputCodec->Jzon.decode(j))
-
-  let jsonResponse = Js.Dict.empty()
 
   switch jsonBodyOption {
   | Ok({title, instructions, ingredients}) => {
@@ -37,12 +51,10 @@ let addRecipe = bodyOption => {
       Store.Reducer.dispatch(
         AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions}),
       )
-      jsonResponse->Js.Dict.set("id", id->Js.Json.string)
+      addRecipeSuccessCodec->Jzon.encode({id: id})
     }
-  | _ => jsonResponse->Js.Dict.set("error", "missing attribute"->Js.Json.string)
+  | Error(error) => errorResultCodec->Jzon.encode({error: error->Jzon.DecodingError.toString})
   }
-
-  jsonResponse->Js.Json.object_
 }
 
 let addTagToRecipe = body => {

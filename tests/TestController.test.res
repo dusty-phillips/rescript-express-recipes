@@ -72,7 +72,7 @@ zoraBlock("Test endpoints", t => {
     let body = Some(Js.Json.parseExn(`{}`))
     let result = body->Controller.addRecipe
     let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
-    let expected = `{"error":"missing attribute"}`
+    let expected = `{"error":"Missing field \\\"title\\\" at ."}`
     t->equal(json, expected, "There should be missing attributes")
     Js.log(json)
   })
