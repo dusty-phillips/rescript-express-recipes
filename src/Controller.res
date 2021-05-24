@@ -61,6 +61,35 @@ let addTagToRecipeInputCodec = Jzon.object2(
   Jzon.field("tag", Jzon.string),
 )
 
+let recipeCodec = Jzon.object7(
+  ({id, title, ingredients, instructions, tags, updatedAt, deleted}: Store.recipe) => (
+    id,
+    title,
+    ingredients,
+    instructions,
+    tags,
+    updatedAt,
+    deleted,
+  ),
+  ((id, title, ingredients, instructions, tags, updatedAt, deleted)) =>
+    {
+      Store.id: id,
+      title: title,
+      ingredients: ingredients,
+      instructions: instructions,
+      tags: tags,
+      updatedAt: updatedAt,
+      deleted: deleted,
+    }->Ok,
+  Jzon.field("id", Jzon.string),
+  Jzon.field("title", Jzon.string),
+  Jzon.field("ingredients", Jzon.string),
+  Jzon.field("instructions", Jzon.string),
+  Jzon.field("tags", Jzon.array(Jzon.string)),
+  Jzon.field("updatedAt", Jzon.float),
+  Jzon.field("deleted", Jzon.bool),
+)
+
 let addRecipe = bodyOption => {
   let jsonBodyOption =
     bodyOption->jsonResult->Belt.Result.flatMap(j => addRecipeInputCodec->Jzon.decode(j))
@@ -95,26 +124,16 @@ let addTagToRecipe = bodyOption => {
 }
 
 let getRecipe = params => {
-  open Belt
-  let jsonResponse = Js.Dict.empty()
   let state = Store.Reducer.getState()
-  let recipeOption =
-    params
-    ->Js.Dict.get("id")
-    ->Option.flatMap(Js.Json.decodeString)
-    ->Option.flatMap(id => state.recipes->Map.String.get(id))
-  switch recipeOption {
-  | None => jsonResponse->Js.Dict.set("error", "unable to find that recipe"->Js.Json.string)
-  | Some(recipe) => {
-      jsonResponse->Js.Dict.set("id", recipe.id->Js.Json.string)
-      jsonResponse->Js.Dict.set("title", recipe.title->Js.Json.string)
-      jsonResponse->Js.Dict.set("ingredients", recipe.ingredients->Js.Json.string)
-      jsonResponse->Js.Dict.set("instructions", recipe.instructions->Js.Json.string)
-      jsonResponse->Js.Dict.set("tags", recipe.tags->Js.Json.stringArray)
+  let recipeResult = genericIdCodec->Jzon.decode(params->Js.Json.object_)
+  switch recipeResult {
+  | Ok({id}) =>
+    switch state.recipes->Belt.Map.String.get(id) {
+    | Some(recipe) => recipeCodec->Jzon.encode(recipe)
+    | None => errorResultCodec->Jzon.encode({error: "unable to find that recipe"})
     }
+  | Error(error) => errorResultCodec->Jzon.encode({error: error->Jzon.DecodingError.toString})
   }
-
-  jsonResponse->Js.Json.object_
 }
 
 let getTag = params => {
