@@ -29,9 +29,13 @@ zoraBlock("Test endpoints", t => {
 
     let result = params->Controller.getRecipe
 
-    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
-    let expected = `{"id":"${id}","title":"Bread","ingredients":"Flour and Water","instructions":"Mix and Bake","tags":[]}`
-    t->equal(json, expected, "get recipe should match input")
+    let actual = Controller.recipeCodec->Jzon.decode(result)->Belt.Result.getExn
+    t->equal(actual.id, id, "should have same ids")
+    t->equal(actual.title, "Bread", "should same title")
+    t->equal(actual.ingredients, "Flour and Water", "have same ingredients")
+    t->equal(actual.instructions, "Mix and Bake", "have same instructions")
+    t->equal(actual.deleted, false, "should not be deleted")
+    t->equal(actual.tags->Belt.Array.length, 0, "Should not have any tags")
 
     let body = Some(
       Js.Json.parseExn(
@@ -52,9 +56,14 @@ zoraBlock("Test endpoints", t => {
 
     let result = params->Controller.getRecipe
 
-    let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
-    let expected = `{"id":"${id}","title":"Bread","ingredients":"Flour and Water","instructions":"Mix and Bake","tags":["Carbs"]}`
-    t->equal(json, expected, "get recipe should match input")
+    let actual = Controller.recipeCodec->Jzon.decode(result)->Belt.Result.getExn
+    t->equal(actual.id, id, "should have same ids")
+    t->equal(actual.title, "Bread", "should same title")
+    t->equal(actual.ingredients, "Flour and Water", "have same ingredients")
+    t->equal(actual.instructions, "Mix and Bake", "have same instructions")
+    t->equal(actual.deleted, false, "should not be deleted")
+    t->equal(actual.tags->Belt.Array.length, 1, "Should have one tag")
+    t->equal(actual.tags->Belt.Array.getUnsafe(0), "Carbs", "First tag should be carbs")
 
     let params = Js.Dict.empty()
     params->Js.Dict.set("tag", "Carbs"->Js.Json.string)

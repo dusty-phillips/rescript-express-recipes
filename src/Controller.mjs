@@ -97,6 +97,31 @@ var addTagToRecipeInputCodec = Jzon.object2((function (param) {
               };
       }), Jzon.field("recipeId", Jzon.string), Jzon.field("tag", Jzon.string));
 
+var recipeCodec = Jzon.object7((function (param) {
+        return [
+                param.id,
+                param.title,
+                param.ingredients,
+                param.instructions,
+                param.tags,
+                param.updatedAt,
+                param.deleted
+              ];
+      }), (function (param) {
+        return {
+                TAG: /* Ok */0,
+                _0: {
+                  id: param[0],
+                  title: param[1],
+                  ingredients: param[2],
+                  instructions: param[3],
+                  tags: param[4],
+                  updatedAt: param[5],
+                  deleted: param[6]
+                }
+              };
+      }), Jzon.field("id", Jzon.string), Jzon.field("title", Jzon.string), Jzon.field("ingredients", Jzon.string), Jzon.field("instructions", Jzon.string), Jzon.field("tags", Jzon.array(Jzon.string)), Jzon.field("updatedAt", Jzon.$$float), Jzon.field("deleted", Jzon.bool));
+
 function addRecipe(bodyOption) {
   var jsonBodyOption = Belt_Result.flatMap(jsonResult(bodyOption), (function (j) {
           return Curry._1(Jzon.decode(addRecipeInputCodec), j);
@@ -148,21 +173,21 @@ function addTagToRecipe(bodyOption) {
 }
 
 function getRecipe(params) {
-  var jsonResponse = {};
   var state = Store.Reducer.getState(undefined);
-  var recipeOption = Belt_Option.flatMap(Belt_Option.flatMap(Js_dict.get(params, "id"), Js_json.decodeString), (function (id) {
-          return Belt_MapString.get(state.recipes, id);
-        }));
-  if (recipeOption !== undefined) {
-    jsonResponse["id"] = recipeOption.id;
-    jsonResponse["title"] = recipeOption.title;
-    jsonResponse["ingredients"] = recipeOption.ingredients;
-    jsonResponse["instructions"] = recipeOption.instructions;
-    jsonResponse["tags"] = recipeOption.tags;
-  } else {
-    jsonResponse["error"] = "unable to find that recipe";
+  var recipeResult = Curry._1(Jzon.decode(genericIdCodec), params);
+  if (recipeResult.TAG !== /* Ok */0) {
+    return Curry._1(Jzon.encode(errorResultCodec), {
+                error: Jzon.DecodingError.toString(recipeResult._0)
+              });
   }
-  return jsonResponse;
+  var recipe = Belt_MapString.get(state.recipes, recipeResult._0.id);
+  if (recipe !== undefined) {
+    return Curry._1(Jzon.encode(recipeCodec), recipe);
+  } else {
+    return Curry._1(Jzon.encode(errorResultCodec), {
+                error: "unable to find that recipe"
+              });
+  }
 }
 
 function getTag(params) {
@@ -194,9 +219,10 @@ export {
   jsonResult ,
   errorResultCodec ,
   genericSuccessCodec ,
+  genericIdCodec ,
   addRecipeInputCodec ,
-  addRecipeSuccessCodec ,
   addTagToRecipeInputCodec ,
+  recipeCodec ,
   addRecipe ,
   addTagToRecipe ,
   getRecipe ,
