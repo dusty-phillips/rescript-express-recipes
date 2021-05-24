@@ -39,7 +39,7 @@ function $$default(t) {
           var body = Caml_option.some(JSON.parse("{}"));
           var result = Controller.addRecipe(body);
           var json = JSON.stringify(result);
-          t.equal(json, "{\"error\":\"missing attribute\"}", "There should be missing attributes");
+          t.equal(json, "{\"error\":\"Missing field \\\"title\\\" at .\"}", "There should be missing attributes");
           console.log(json);
           
         }));
