@@ -14,6 +14,14 @@ let errorResultCodec = Jzon.object1(
   Jzon.field("error", Jzon.string),
 )
 
+type genericSuccess = {success: bool}
+
+let genericSuccessCodec = Jzon.object1(
+  ({success}) => success,
+  success => {success: success}->Ok,
+  Jzon.field("success", Jzon.bool),
+)
+
 type addRecipeInput = {
   title: string,
   ingredients: string,
@@ -41,6 +49,22 @@ let addRecipeSuccessCodec = Jzon.object1(
   Jzon.field("id", Jzon.string),
 )
 
+type addTagToRecipe = {
+  recipeId: string,
+  tag: string,
+}
+
+let addTagToRecipeInputCodec = Jzon.object2(
+  ({recipeId, tag}) => (recipeId, tag),
+  ((recipeId, tag)) =>
+    {
+      recipeId: recipeId,
+      tag: tag,
+    }->Ok,
+  Jzon.field("recipeId", Jzon.string),
+  Jzon.field("tag", Jzon.string),
+)
+
 let addRecipe = bodyOption => {
   let jsonBodyOption =
     bodyOption->jsonResult->Belt.Result.flatMap(j => addRecipeInputCodec->Jzon.decode(j))
@@ -57,31 +81,21 @@ let addRecipe = bodyOption => {
   }
 }
 
-let addTagToRecipe = body => {
-  open Belt
-  open Store.Reducer
-  let jsonResponse = Js.Dict.empty()
+let addTagToRecipe = bodyOption => {
+  let jsonBodyOption =
+    bodyOption->jsonResult->Belt.Result.flatMap(j => addTagToRecipeInputCodec->Jzon.decode(j))
 
-  let jsonFields =
-    body
-    ->Option.flatMap(Js.Json.decodeObject)
-    ->Option.map(jsonBody => (
-      jsonBody
-      ->Js.Dict.get("recipeId")
-      ->Option.flatMap(Js.Json.decodeString)
-      ->Option.flatMap(id => getState().recipes->Map.String.get(id)),
-      jsonBody->Js.Dict.get("tag")->Option.flatMap(Js.Json.decodeString),
-    ))
-
-  switch jsonFields {
-  | Some(Some(recipe), Some(tag)) => {
-      jsonResponse->Js.Dict.set("success", true->Js.Json.boolean)
-      dispatch(AddTag({recipeId: recipe.id, tag: tag}))
+  switch jsonBodyOption {
+  | Ok({recipeId, tag}) =>
+    switch Store.Reducer.getState().recipes->Belt.Map.String.get(recipeId) {
+    | Some(recipe) => {
+        Store.Reducer.dispatch(AddTag({recipeId: recipe.id, tag: tag}))
+        genericSuccessCodec->Jzon.encode({success: true})
+      }
+    | None => errorResultCodec->Jzon.encode({error: "recipe does not exist"})
     }
-  | _ => jsonResponse->Js.Dict.set("error", "invalid request"->Js.Json.string)
+  | Error(error) => errorResultCodec->Jzon.encode({error: error->Jzon.DecodingError.toString})
   }
-
-  jsonResponse->Js.Json.object_
 }
 
 let getRecipe = params => {

@@ -48,7 +48,7 @@ Zora.test("Test endpoints", (function (t) {
                 var body = Caml_option.some(JSON.parse("\n        {\n          \"recipeId\": \"Not a Recipe\",\n          \"tag\": \"Carbs\"\n        }\n        "));
                 var result = Controller.addTagToRecipe(body);
                 var json = JSON.stringify(result);
-                t.equal(json, "{\"error\":\"invalid request\"}", "addTagToRecipe should return success");
+                t.equal(json, "{\"error\":\"recipe does not exist\"}", "addTagToRecipe should return success");
                 
               }));
         t.test("Can't get recipe that doesn't exist", (function (t) {

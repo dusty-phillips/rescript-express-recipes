@@ -88,7 +88,7 @@ zoraBlock("Test endpoints", t => {
     )
     let result = body->Controller.addTagToRecipe
     let json = result->Js.Json.stringifyAny->Belt.Option.getUnsafe
-    let expected = `{"error":"invalid request"}`
+    let expected = `{"error":"recipe does not exist"}`
     t->equal(json, expected, "addTagToRecipe should return success")
   })
 
