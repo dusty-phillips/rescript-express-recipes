@@ -54,6 +54,17 @@ var genericSuccessCodec = Jzon.object1((function (param) {
               };
       }), Jzon.field("success", Jzon.bool));
 
+var genericIdCodec = Jzon.object1((function (param) {
+        return param.id;
+      }), (function (id) {
+        return {
+                TAG: /* Ok */0,
+                _0: {
+                  id: id
+                }
+              };
+      }), Jzon.field("id", Jzon.string));
+
 var addRecipeInputCodec = Jzon.object3((function (param) {
         return [
                 param.title,
@@ -70,17 +81,6 @@ var addRecipeInputCodec = Jzon.object3((function (param) {
                 }
               };
       }), Jzon.field("title", Jzon.string), Jzon.field("ingredients", Jzon.string), Jzon.field("instructions", Jzon.string));
-
-var addRecipeSuccessCodec = Jzon.object1((function (param) {
-        return param.id;
-      }), (function (id) {
-        return {
-                TAG: /* Ok */0,
-                _0: {
-                  id: id
-                }
-              };
-      }), Jzon.field("id", Jzon.string));
 
 var addTagToRecipeInputCodec = Jzon.object2((function (param) {
         return [
@@ -115,7 +115,7 @@ function addRecipe(bodyOption) {
         ingredients: match.ingredients,
         instructions: match.instructions
       });
-  return Curry._1(Jzon.encode(addRecipeSuccessCodec), {
+  return Curry._1(Jzon.encode(genericIdCodec), {
               id: id
             });
 }

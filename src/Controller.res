@@ -22,6 +22,10 @@ let genericSuccessCodec = Jzon.object1(
   Jzon.field("success", Jzon.bool),
 )
 
+type genericId = {id: string}
+
+let genericIdCodec = Jzon.object1(({id}) => id, id => {id: id}->Ok, Jzon.field("id", Jzon.string))
+
 type addRecipeInput = {
   title: string,
   ingredients: string,
@@ -39,14 +43,6 @@ let addRecipeInputCodec = Jzon.object3(
   Jzon.field("title", Jzon.string),
   Jzon.field("ingredients", Jzon.string),
   Jzon.field("instructions", Jzon.string),
-)
-
-type addRecipeSuccess = {id: string}
-
-let addRecipeSuccessCodec = Jzon.object1(
-  ({id}) => id,
-  id => {id: id}->Ok,
-  Jzon.field("id", Jzon.string),
 )
 
 type addTagToRecipe = {
@@ -75,7 +71,7 @@ let addRecipe = bodyOption => {
       Store.Reducer.dispatch(
         AddRecipe({id: id, title: title, ingredients: ingredients, instructions: instructions}),
       )
-      addRecipeSuccessCodec->Jzon.encode({id: id})
+      genericIdCodec->Jzon.encode({id: id})
     }
   | Error(error) => errorResultCodec->Jzon.encode({error: error->Jzon.DecodingError.toString})
   }
